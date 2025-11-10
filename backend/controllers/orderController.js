@@ -1,16 +1,22 @@
-const Order = require('../models/Order');
+// backend/controllers/orderController.js
+
+const orderService = require('../services/order.service'); // Import the new service
 
 // @desc Create a new order
 // @route POST /api/orders
 // @access Private (Requires Auth)
 exports.placeOrder = async (req, res) => {
-    const { items, total } = req.body;
+    // Only items are needed from the body; the total is calculated by the service
+    const { items } = req.body; 
     try {
-        // req.user.id is populated by authentication middleware
-        const newOrder = await Order.create({ userId: req.user.id, items, total, status: 'Pending' });
+        // Pass userId and the items array to the Service layer
+        const newOrder = await orderService.createOrder(req.user.id, items); 
+        
         res.status(201).json({ message: 'Order placed successfully', order: newOrder });
     } catch (error) {
-        res.status(500).json({ message: 'Could not place order' });
+        // Use the centralized error handler (next(error)) instead of local res.status(500)
+        // For now, if you haven't implemented it:
+        res.status(400).json({ message: error.message || 'Could not place order' });
     }
 };
 
@@ -19,8 +25,8 @@ exports.placeOrder = async (req, res) => {
 // @access Private (Requires Auth)
 exports.getOrderHistory = async (req, res) => {
     try {
-        // req.user.id is populated by authentication middleware
-        const orders = await Order.findHistoryByUserId(req.user.id);
+        // Delegate complex fetching logic to the Service layer
+        const orders = await orderService.getOrderHistory(req.user.id);
         res.json(orders);
     } catch (error) {
         res.status(500).json({ message: 'Failed to retrieve order history' });
