@@ -1,49 +1,70 @@
 const jwt = require('jsonwebtoken');
-const User = require('../models/User'); // Required to verify user role
-require('dotenv').config();
+const User = require('../models/User'); // Used to fetch full user data if needed
 
-const JWT_SECRET = process.env.JWT_SECRET || 'your_default_secret_key';
+// Secret key should be loaded from .env
+const JWT_SECRET = process.env.JWT_SECRET || 'your_secret_key'; 
 
 /**
- * Middleware to protect routes: validates JWT token and attaches user to req.user.
+ * Middleware to check for a valid JWT and attach user data to the request.
+ * Required for all protected routes.
  */
 exports.protect = async (req, res, next) => {
     let token;
 
-    // 1. Check for token in headers (Bearer token format)
+    // Check for token in the Authorization header (Bearer token)
     if (req.headers.authorization && req.headers.authorization.startsWith('Bearer')) {
         try {
-            // Get token from header (removes 'Bearer ')
+            // Extract the token (Token is typically 'Bearer TOKEN_STRING')
             token = req.headers.authorization.split(' ')[1];
 
-            // 2. Verify token
+            // Verify the token
             const decoded = jwt.verify(token, JWT_SECRET);
 
-            // 3. Find user and attach to request object (excluding password)
-            // We only attach the ID and role from the token payload for simplicity here,
-            // but a full app would fetch the User object.
-            req.user = decoded; 
+            // Find the user by ID from the payload (excluding the password)
+            // Assuming your User model has a static findById method
+            const user = await User.findByPk(decoded.id, {
+                attributes: { exclude: ['password'] }
+            });
+
+            if (!user) {
+                return next(new Error('User associated with token not found.'));
+            }
+
+            // Attach user object to the request for controller access
+            req.user = user; 
             
             next();
+
         } catch (error) {
-            console.error(error);
-            return res.status(401).json({ message: 'Not authorized, token failed' });
+            // Handle expired, invalid, or tampered token errors
+            if (error.name === 'TokenExpiredError') {
+                 return res.status(401).json({ message: 'Token expired. Please log in again.' });
+            }
+            if (error.name === 'JsonWebTokenError') {
+                 return res.status(401).json({ message: 'Invalid token format or signature.' });
+            }
+            // Pass any other errors to the central error handler
+            next(error); 
         }
     }
 
     if (!token) {
-        return res.status(401).json({ message: 'Not authorized, no token provided' });
+        // No token provided at all
+        res.status(401);
+        next(new Error('Access denied. No token provided.'));
     }
 };
 
 /**
- * Middleware to restrict access to Admin users only.
+ * Middleware to restrict access only to users with the 'admin' role.
+ * Must be used AFTER the 'protect' middleware.
  */
 exports.adminOnly = (req, res, next) => {
-    // Requires the 'protect' middleware to run first (req.user must exist)
+    // req.user is set by the 'protect' middleware
     if (req.user && req.user.role === 'admin') {
         next();
     } else {
-        return res.status(403).json({ message: 'Not authorized as admin' });
+        res.status(403);
+        next(new Error('Access denied. Admin privileges required.'));
     }
 };
