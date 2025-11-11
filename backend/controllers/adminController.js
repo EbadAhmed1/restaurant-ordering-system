@@ -43,3 +43,24 @@ exports.getAllOrders = async (req, res, next) => {
         next(error);
     }
 };
+
+// @desc Update the status of any order (e.g., to 'Delivered')
+// @route PUT /api/admin/orders/:id/status (Admin Only)
+exports.updateOrderStatus = async (req, res, next) => {
+    const { status } = req.body; // Status is validated by middleware
+
+    try {
+        const order = await Order.findByPk(req.params.id);
+
+        if (!order) {
+            res.status(404);
+            return next(new Error('Order not found'));
+        }
+
+        await order.update({ status });
+
+        res.json({ message: `Order ${req.params.id} status updated to ${status}`, order });
+    } catch (error) {
+        next(error);
+    }
+};
