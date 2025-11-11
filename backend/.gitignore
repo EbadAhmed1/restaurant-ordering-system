@@ -1,0 +1,21 @@
+# --- Dependencies and Build Artifacts ---
+/node_modules
+/package-lock.json
+/yarn.lock
+/dist
+/build
+
+# --- Environment Variables & Secrets ---
+# CRITICAL: This prevents your sensitive credentials from being committed
+.env
+.env.local
+.env.development
+.env.production
+
+# --- Uploads and Log Files ---
+# Ignore the directory where Multer stores user-uploaded images
+/public/uploads/
+
+# Common log files
+npm-debug.log
+.eslintcache

@@ -1,19 +1,27 @@
 const bcrypt = require('bcrypt');
 const jwt = require('jsonwebtoken');
-// Assumes a User model exists in '../models/User.js'
+
 const User = require('../models/User'); 
 
-// Secret key should be loaded from .env file for production security
-const JWT_SECRET = process.env.JWT_SECRET || 'your_secret_key'; 
+
+// Load secret key from .env file and ensure it is present.
+const JWT_SECRET = process.env.JWT_SECRET; 
+if (!JWT_SECRET) {
+    // Application should fail to start if the secret is missing
+    throw new Error('JWT_SECRET not defined in environment variables'); 
+}
+// --------------------------------
 
 // @desc Register a new user
 // @route POST /api/auth/register
-exports.register = async (req, res) => {
+exports.register = async (req, res, next) => { // Added 'next'
     const { username, email, password, role } = req.body;
     try {
         let user = await User.findByEmail(email);
         if (user) {
-            return res.status(400).json({ message: 'User already exists' });
+            // Set 400 status before passing to error handler
+            res.status(400); 
+            return next(new Error('User already exists'));
         }
 
         const salt = await bcrypt.genSalt(10);
@@ -27,30 +35,35 @@ exports.register = async (req, res) => {
         });
 
         const token = jwt.sign({ id: user.id, role: user.role }, JWT_SECRET, { expiresIn: '1d' });
-        res.status(201).json({ token, user: user.toResponseObject() }); // toResponseObject removes password
+        res.status(201).json({ token, user: user.toResponseObject() });
     } catch (error) {
-        res.status(500).json({ message: 'Server error during registration' });
+        // Use central error handling
+        next(error); 
     }
 };
 
 // @desc Authenticate a user and return token
 // @route POST /api/auth/login
-exports.login = async (req, res) => {
+exports.login = async (req, res, next) => { // Added 'next'
     const { email, password } = req.body;
     try {
+        // Assuming findByEmail retrieves the password hash for comparison
         const user = await User.findByEmail(email);
         if (!user) {
-            return res.status(400).json({ message: 'Invalid Credentials' });
+            res.status(400);
+            return next(new Error('Invalid Credentials'));
         }
 
         const isMatch = await bcrypt.compare(password, user.password);
         if (!isMatch) {
-            return res.status(400).json({ message: 'Invalid Credentials' });
+            res.status(400);
+            return next(new Error('Invalid Credentials'));
         }
 
         const token = jwt.sign({ id: user.id, role: user.role }, JWT_SECRET, { expiresIn: '1d' });
         res.json({ token, user: user.toResponseObject() });
     } catch (error) {
-        res.status(500).json({ message: 'Server error during login' });
+        // Use central error handling
+        next(error); 
     }
 };
