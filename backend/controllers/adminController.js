@@ -1,4 +1,6 @@
-const Menu = require('../models/Menu'); // Assumes a Menu model
+const Menu = require('../models/Menu'); 
+const Order = require('../models/Order'); 
+const User = require('../models/User'); 
 
 // @desc Add a new menu item
 // @route POST /api/admin/menu
@@ -28,4 +30,16 @@ exports.getAllUsers = async (req, res) => {
     }
 };
 
-// You can add update, delete, and statistics methods here
+// @desc Get all orders in the system (for monitoring)
+// @route GET /api/admin/orders (Admin Only)
+exports.getAllOrders = async (req, res, next) => {
+    try {
+        // Fetch all orders, ordering by latest first
+        const orders = await Order.findAll({
+            order: [['createdAt', 'DESC']],
+        });
+        res.json(orders);
+    } catch (error) {
+        next(error);
+    }
+};
