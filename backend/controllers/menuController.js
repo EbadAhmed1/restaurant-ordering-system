@@ -35,3 +35,29 @@ exports.addMenuItem = async (req, res, next) => {
     }
 };
 
+// @desc Update an existing menu item
+// @route PUT /api/menu/:id (Admin Only)
+exports.updateMenuItem = async (req, res, next) => {
+    const { name, description, price, category, isAvailable } = req.body;
+    // req.file is populated by the multer middleware
+    const imageUrl = req.file ? req.file.path.replace('public', '') : req.body.imageUrl; 
+
+    try {
+        const item = await Menu.findByPk(req.params.id);
+
+        if (!item) {
+            res.status(404);
+            return next(new Error('Menu item not found'));
+        }
+
+        // Use Sequelize's update method
+        await item.update({ 
+            name, description, price, category, isAvailable, imageUrl
+        });
+
+        res.json({ message: 'Menu item updated successfully', item });
+    } catch (error) {
+        next(error);
+    }
+};
+
