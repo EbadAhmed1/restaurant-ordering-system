@@ -61,3 +61,21 @@ exports.updateMenuItem = async (req, res, next) => {
     }
 };
 
+// @desc Delete a menu item
+// @route DELETE /api/menu/:id (Admin Only)
+exports.deleteMenuItem = async (req, res, next) => {
+    try {
+        const item = await Menu.findByPk(req.params.id);
+
+        if (!item) {
+            res.status(404);
+            return next(new Error('Menu item not found'));
+        }
+
+        await item.destroy();
+
+        res.json({ message: 'Menu item deleted successfully' });
+    } catch (error) {
+        next(error);
+    }
+};
