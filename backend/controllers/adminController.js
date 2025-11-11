@@ -21,12 +21,14 @@ exports.addMenuItem = async (req, res) => {
 // @desc Get all user accounts (for management)
 // @route GET /api/admin/users
 // @access Private (Admin Only)
-exports.getAllUsers = async (req, res) => {
+exports.getAllUsers = async (req, res, next) => {
     try {
-        const users = await User.findAllUsers(); // Assumes function to retrieve all users
+        const users = await User.findAll({
+            attributes: { exclude: ['password'] } // Never return passwords
+        }); 
         res.json(users);
     } catch (error) {
-        res.status(500).json({ message: 'Failed to fetch users' });
+        next(error);
     }
 };
 
