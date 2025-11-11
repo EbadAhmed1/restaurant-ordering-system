@@ -3,28 +3,33 @@ const User = require('../models/User');
 // @desc Get user profile details
 // @route GET /api/users/profile
 // @access Private (Requires Auth)
-exports.getProfile = async (req, res) => {
+exports.getProfile = async (req, res, next) => { // Added 'next'
     try {
         // req.user.id is populated by authentication middleware
-        const user = await User.findById(req.user.id);
+        // Assuming findById is correctly implemented in User model to exclude password
+        const user = await User.findById(req.user.id); 
         if (!user) {
-            return res.status(404).json({ message: 'User not found' });
+            res.status(404);
+            return next(new Error('User not found'));
         }
         res.json(user.toResponseObject());
     } catch (error) {
-        res.status(500).json({ message: 'Error fetching profile' });
+        // Use central error handling
+        next(error);
     }
 };
 
 // @desc Update user profile details
 // @route PUT /api/users/profile
 // @access Private (Requires Auth)
-exports.updateProfile = async (req, res) => {
+exports.updateProfile = async (req, res, next) => { // Added 'next'
     const { username, email } = req.body;
     try {
+        // Assuming User.update handles finding the user and applying updates
         const updatedUser = await User.update(req.user.id, { username, email });
         res.json({ message: 'Profile updated successfully', user: updatedUser.toResponseObject() });
     } catch (error) {
-        res.status(500).json({ message: 'Failed to update profile' });
+        // Use central error handling
+        next(error);
     }
 };
