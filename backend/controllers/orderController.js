@@ -1,5 +1,3 @@
-// backend/controllers/orderController.js
-
 const orderService = require('../services/order.service'); // Import the new service
 
 // @desc Create a new order
@@ -30,5 +28,29 @@ exports.getOrderHistory = async (req, res) => {
         res.json(orders);
     } catch (error) {
         res.status(500).json({ message: 'Failed to retrieve order history' });
+    }
+};
+
+// @desc Get details of a specific order (must belong to the authenticated user)
+// @route GET /api/orders/:id
+exports.getOrderDetails = async (req, res, next) => {
+    const Order = require('../models/Order'); // Local import for convenience
+
+    try {
+        const order = await Order.findOne({
+            where: {
+                id: req.params.id,
+                userId: req.user.id // CRITICAL: Check if the order belongs to the user
+            }
+        });
+
+        if (!order) {
+            res.status(404);
+            return next(new Error('Order not found or access denied.'));
+        }
+
+        res.json(order);
+    } catch (error) {
+        next(error);
     }
 };
