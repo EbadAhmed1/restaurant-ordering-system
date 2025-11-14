@@ -25,3 +25,19 @@ apiClient.interceptors.request.use(
         return Promise.reject(error);
     }
 );
+
+// Response Interceptor: Handle 401 (Unauthorized) errors globally
+apiClient.interceptors.response.use(
+    (response) => response,
+    (error) => {
+        const { status } = error.response;
+        if (status === 401 || status === 403) {
+            // If the token is invalid, expired, or user is unauthorized (403), log them out
+            store.dispatch(logout()); 
+            // Optional: Add a toast notification here later
+        }
+        return Promise.reject(error);
+    }
+);
+
+export default apiClient;
