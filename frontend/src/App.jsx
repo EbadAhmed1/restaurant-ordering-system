@@ -15,3 +15,35 @@ import AdminDashboard from './pages/admin/AdminDashboard.jsx';
 import PrivateRoute from './components/security/PrivateRoute.jsx';
 import AdminRoute from './components/security/AdminRoute.jsx';
 import PublicLayout from './components/layouts/PublicLayout.jsx';
+
+const App = () => {
+    return (
+        <Routes>
+            {/* --- Public Routes with Public Layout --- */}
+            <Route path="/" element={<PublicLayout />}>
+                <Route index element={<Home />} />
+                <Route path="menu" element={<Menu />} />
+                <Route path="cart" element={<Cart />} />
+                <Route path="checkout" element={<Checkout />} />
+                <Route path="login" element={<Login />} />
+                <Route path="register" element={<Register />} />
+            </Route>
+
+            {/* --- Protected Customer Routes --- */}
+            <Route element={<PrivateRoute allowedRoles={['customer', 'admin']} />}>
+                <Route path="/checkout" element={<Checkout />} />
+            </Route>
+            
+            {/* --- Protected Admin Routes --- */}
+            <Route element={<AdminRoute allowedRoles={['admin']} />}>
+                <Route path="/admin/dashboard" element={<AdminDashboard />} />
+                {/* Add other admin routes here (Manage Menu, Orders, etc.) */}
+            </Route>
+
+            {/* Catch-all for 404 */}
+            <Route path="*" element={<Navigate to="/" replace />} />
+        </Routes>
+    );
+};
+
+export default App;
