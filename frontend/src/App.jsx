@@ -21,23 +21,21 @@ const App = () => {
         <Routes>
             {/* --- Public Routes with Public Layout --- */}
             <Route path="/" element={<PublicLayout />}>
-                <Route index element={<Home />} />
-                <Route path="menu" element={<Menu />} />
-                <Route path="cart" element={<Cart />} />
-                <Route path="checkout" element={<Checkout />} />
-                <Route path="login" element={<Login />} />
-                <Route path="register" element={<Register />} />
+                {/* ... (Public route definitions: home, menu, cart, login, register) */}
             </Route>
 
-            {/* --- Protected Customer Routes --- */}
+            {/* --- Protected Customer/Admin Routes --- */}
+            {/* Example: Any logged-in user can reach checkout/history */}
             <Route element={<PrivateRoute allowedRoles={['customer', 'admin']} />}>
                 <Route path="/checkout" element={<Checkout />} />
+                <Route path="/orders/history" element={<OrderHistory />} /> {/* Example History route */}
             </Route>
             
-            {/* --- Protected Admin Routes --- */}
-            <Route element={<AdminRoute allowedRoles={['admin']} />}>
+            {/* --- Protected Admin Routes (Explicitly checks for 'admin' role) --- */}
+            <Route element={<PrivateRoute allowedRoles={['admin']} />}>
                 <Route path="/admin/dashboard" element={<AdminDashboard />} />
-                {/* Add other admin routes here (Manage Menu, Orders, etc.) */}
+                <Route path="/admin/manage-menu" element={<ManageMenu />} />
+                <Route path="/admin/manage-orders" element={<ManageOrders />} />
             </Route>
 
             {/* Catch-all for 404 */}
