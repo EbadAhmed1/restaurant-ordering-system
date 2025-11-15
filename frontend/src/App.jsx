@@ -32,7 +32,7 @@ const App = () => {
             </Route>
             
             {/* --- Protected Admin Routes (Explicitly checks for 'admin' role) --- */}
-            <Route element={<PrivateRoute allowedRoles={['admin']} />}>
+            <Route element={<AdminRoute />}>
                 <Route path="/admin/dashboard" element={<AdminDashboard />} />
                 <Route path="/admin/manage-menu" element={<ManageMenu />} />
                 <Route path="/admin/manage-orders" element={<ManageOrders />} />
