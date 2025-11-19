@@ -6,8 +6,8 @@ import authReducer from './features/auth/authSlice';
 const store = configureStore({
     reducer: {
         auth: authReducer,
-        // cart: cartReducer, 
-        // menu: menuReducer, 
+        cart: cartReducer, 
+        menu: menuReducer, 
     },
 });
 
