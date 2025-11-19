@@ -14,8 +14,9 @@ const Header = () => {
     return (
         <header className="navbar navbar-expand-lg navbar-dark bg-dark fixed-top">
             <div className="container-fluid">
+                {/* CHANGED: Updated Brand Name */}
                 <Link className="navbar-brand" to="/">
-                    Luigi's Pizzeria
+                    OrderHub
                 </Link>
                 
                 <div className="collapse navbar-collapse">
@@ -35,7 +36,7 @@ const Header = () => {
                         <li className="nav-item">
                             <Link className="nav-link" to="/cart">
                                 <i className="fa fa-shopping-cart me-2"></i>
-                                Cart (0) {/* Dynamically update cart count later */}
+                                Cart (0) 
                             </Link>
                         </li>
                         
