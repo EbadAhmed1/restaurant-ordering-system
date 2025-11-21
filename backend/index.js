@@ -4,7 +4,7 @@ const allRoutes = require('./routes/index');
 const errorHandler = require('./middleware/error.middleware'); 
 const cors = require('cors'); 
 const helmet = require('helmet'); 
-require('dotenv').config(); 
+require('dotenv').config({ path: './backend/.env' });
 
 const app = express();
 const PORT = process.env.PORT || 5000;
