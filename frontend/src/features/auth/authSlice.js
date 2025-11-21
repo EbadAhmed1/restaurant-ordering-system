@@ -3,7 +3,7 @@ import axios from 'axios';
 
 // --- Configuration ---
 // Base URL for your Node/Express API authentication routes
-const API_URL = 'http://localhost:8000/api/auth/';
+const API_URL = 'http://localhost:5000/api/auth/';
 
 // Check localStorage for persisted user/token on app startup
 const token = localStorage.getItem('token');
