@@ -8,7 +8,9 @@ import Register from './pages/public/Register.jsx';
 import Menu from './pages/public/Menu.jsx';
 import Cart from './pages/public/Cart.jsx';
 import Checkout from './pages/public/Checkout.jsx';
-// import AdminDashboard from './pages/admin/AdminDashboard.jsx'; // Comment this out if you haven't created it yet
+import AdminDashboard from './pages/admin/AdminDashboard.jsx';
+import ManageMenu from './pages/admin/ManageMenu.jsx';
+import ManageOrders from './pages/admin/ManageOrders.jsx';
 
 // Components for Protected Routes
 import PrivateRoute from './components/security/PrivateRoute.jsx';
@@ -37,9 +39,9 @@ const App = () => {
             
             {/* --- Protected Admin Routes --- */}
             <Route element={<PrivateRoute allowedRoles={['admin']} />}>
-                {/* <Route path="/admin/dashboard" element={<AdminDashboard />} />   <-- COMMENT THIS OUT */}
-                {/* <Route path="/admin/manage-menu" element={<ManageMenu />} />     <-- COMMENT THIS OUT */}
-                {/* <Route path="/admin/manage-orders" element={<ManageOrders />} /> <-- COMMENT THIS OUT */}
+                {<Route path="/admin/dashboard" element={<AdminDashboard />} />   }
+                {<Route path="/admin/manage-menu" element={<ManageMenu />} />     }
+                {<Route path="/admin/manage-orders" element={<ManageOrders />} /> }
             </Route>
 
             {/* Catch-all for 404 */}
