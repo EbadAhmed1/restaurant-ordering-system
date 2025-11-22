@@ -43,7 +43,9 @@ const MenuItemCard = ({ item }) => {
                     src={getImageUrl(item.imageUrl)} 
                     alt={item.name} 
                     style={{ height: '200px', objectFit: 'cover' }}
-                    onError={(e) => { e.target.src = PLACEHOLDER_IMAGE; }} 
+                    referrerPolicy="no-referrer"
+                    crossOrigin="anonymous"
+                    // onError={(e) => { e.target.src = PLACEHOLDER_IMAGE; }} 
                 />
                 <div className="card-body d-flex flex-column">
                     <h5 className="card-title text-center">{item.name}</h5>
