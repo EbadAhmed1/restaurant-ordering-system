@@ -1,18 +1,14 @@
 import axios from 'axios';
-import { store } from '../store';
+import store from '../store'; // Removed curly braces based on previous fix
 import { logout } from '../features/auth/authSlice';
 
-// Create a configured Axios instance
 const apiClient = axios.create({
-    // Since React app and Express API run on different ports (e.g., 3000 and 8000), 
-    // we use the backend port for the base URL.
-    baseURL: 'http://localhost:8000/api', 
+    baseURL: 'http://localhost:5000/api',
     headers: {
         'Content-Type': 'application/json',
     },
 });
 
-// Request Interceptor: Attach JWT token to headers for protected routes
 apiClient.interceptors.request.use(
     (config) => {
         const token = store.getState().auth.token;
@@ -26,15 +22,18 @@ apiClient.interceptors.request.use(
     }
 );
 
-// Response Interceptor: Handle 401 (Unauthorized) errors globally
 apiClient.interceptors.response.use(
     (response) => response,
     (error) => {
-        const { status } = error.response;
-        if (status === 401 || status === 403) {
-            // If the token is invalid, expired, or user is unauthorized (403), log them out
-            store.dispatch(logout()); 
-            // Optional: Add a toast notification here later
+        // CHANGED: Check if error.response exists before accessing properties
+        if (error.response) {
+            const { status } = error.response;
+            if (status === 401 || status === 403) {
+                store.dispatch(logout()); 
+            }
+        } else {
+            // Network error or Server down (no response received)
+            console.error("Network Error or Server is down:", error.message);
         }
         return Promise.reject(error);
     }
