@@ -4,8 +4,7 @@ import { addItemToCart } from '../cart/cartSlice';
 import { toast } from 'react-toastify';
 
 // Fallback image if the product doesn't have one
-// You can place a real image at src/assets/images/default.jpg
-const PLACEHOLDER_IMAGE = 'https://placehold.co/600x400?text=Delicious+Food'; 
+const PLACEHOLDER_IMAGE = 'https://placehold.co/600x400?text=No+Image'; 
 
 const MenuItemCard = ({ item }) => {
     const dispatch = useDispatch();
@@ -13,9 +12,22 @@ const MenuItemCard = ({ item }) => {
     // Helper to construct the full image URL from the backend
     const getImageUrl = (imagePath) => {
         if (!imagePath) return PLACEHOLDER_IMAGE;
-        // If the path in DB is like "/uploads/...", prepend backend URL
-        // Adjust 'http://localhost:8000' if your port is different
-        return `http://localhost:8000${imagePath}`;
+
+        // 1. Clean up Windows slashes to forward slashes
+        let cleanPath = imagePath.replace(/\\/g, '/');
+
+        // 2. Ensure it starts with a slash
+        if (!cleanPath.startsWith('/')) {
+            cleanPath = `/${cleanPath}`;
+        }
+
+        // 3. Prepend '/public' if it's missing (because DB usually stores /uploads/...)
+        if (!cleanPath.startsWith('/public')) {
+            cleanPath = `/public${cleanPath}`;
+        }
+
+        // 4. Return full URL with correct Backend Port (5000)
+        return `http://localhost:5000${cleanPath}`;
     };
 
     const handleAddToCart = () => {
@@ -31,16 +43,14 @@ const MenuItemCard = ({ item }) => {
                     src={getImageUrl(item.imageUrl)} 
                     alt={item.name} 
                     style={{ height: '200px', objectFit: 'cover' }}
-                    onError={(e) => { e.target.src = PLACEHOLDER_IMAGE; }} // Fallback on error
+                    onError={(e) => { e.target.src = PLACEHOLDER_IMAGE; }} 
                 />
                 <div className="card-body d-flex flex-column">
                     <h5 className="card-title text-center">{item.name}</h5>
                     <p className="card-text text-muted flex-grow-1">
-                        {/* Show description or default text */}
-                        {item.description ? item.description.substring(0, 70) + '...' : 'Tasty and fresh!'}
+                        {item.description ? item.description.substring(0, 70) + '...' : 'Fresh and delicious!'}
                     </p>
                     <div className="d-flex justify-content-between align-items-center mt-3">
-                        {/* Display Price */}
                         <h4 className="text-success mb-0">
                             Rs. {parseFloat(item.price).toFixed(2)}
                         </h4>
@@ -58,4 +68,4 @@ const MenuItemCard = ({ item }) => {
     );
 };
 
-export default MenuItemCard; 
+export default MenuItemCard;
