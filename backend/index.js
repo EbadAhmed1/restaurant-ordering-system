@@ -20,6 +20,10 @@ const startServer = async () => {
     app.use(cors()); // Allow cross-origin requests from your frontend
     app.use(express.json()); // Body parser for JSON requests
 
+
+    app.use('/public', express.static('public'));
+
+    
     // --- Routes ---
     app.use('/api', allRoutes);
 
