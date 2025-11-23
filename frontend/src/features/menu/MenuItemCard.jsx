@@ -54,7 +54,7 @@ const MenuItemCard = ({ item }) => {
                     </p>
                     <div className="d-flex justify-content-between align-items-center mt-3">
                         <h4 className="text-success mb-0">
-                            Rs. {parseFloat(item.price).toFixed(2)}
+                            €{parseFloat(item.price).toFixed(2)}
                         </h4>
                         <button 
                             className="btn btn-primary btn-sm"
