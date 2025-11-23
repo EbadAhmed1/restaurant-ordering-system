@@ -70,13 +70,13 @@ const Checkout = () => {
                                             <span className="badge badge-primary badge-pill mr-3">{item.quantity}x</span>
                                             {item.name}
                                         </div>
-                                        <span>Rs. {(item.price * item.quantity).toFixed(2)}</span>
+                                        <span>€{(item.price * item.quantity).toFixed(2)}</span>
                                     </li>
                                 ))}
                                 <li className="list-group-item d-flex justify-content-between align-items-center bg-light">
                                     <strong>Total Amount</strong>
                                     <strong className="text-success" style={{ fontSize: '1.2rem' }}>
-                                        Rs. {totalAmount.toFixed(2)}
+                                        €{totalAmount.toFixed(2)}
                                     </strong>
                                 </li>
                             </ul>
@@ -156,7 +156,7 @@ const Checkout = () => {
                                     </div>
                                     <h5>Confirm Your Order?</h5>
                                     <p className="text-muted mb-1">You are about to place an order via <strong>{paymentMethod}</strong>.</p>
-                                    <h3 className="text-primary my-3">Rs. {totalAmount.toFixed(2)}</h3>
+                                    <h3 className="text-primary my-3">€{totalAmount.toFixed(2)}</h3>
                                     <p className="small text-muted">Please have the exact amount ready upon delivery.</p>
                                 </div>
                                 <div className="modal-footer">
