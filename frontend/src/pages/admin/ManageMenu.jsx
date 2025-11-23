@@ -92,7 +92,10 @@ const ManageMenu = () => {
                         <div className="col-md-6 mb-3">
                             <select className="form-control" name="category" value={formData.category} onChange={handleInputChange}>
                                 <option value="Pizza">Pizza</option>
+                                <option value="Burger">Burger</option>
                                 <option value="Pasta">Pasta</option>
+                                <option value="Sides">Sides</option>
+                                <option value="Salad">Salad</option>
                                 <option value="Drinks">Drinks</option>
                                 <option value="Dessert">Dessert</option>
                             </select>
