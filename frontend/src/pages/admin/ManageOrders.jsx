@@ -31,6 +31,17 @@ const ManageOrders = () => {
         }
     };
 
+    // Helper to determine badge color
+    const getStatusBadgeClass = (status) => {
+        switch (status) {
+            case 'Delivered': return 'badge badge-success'; // Green
+            case 'Cancelled': return 'badge badge-danger';  // Red
+            case 'Processing': return 'badge badge-info text-white';   // Blue
+            case 'Pending': return 'badge badge-warning text-dark'; // Yellow
+            default: return 'badge badge-secondary';        // Grey
+        }
+    };
+
     if (loading) return <div className="container py-5">Loading Orders...</div>;
 
     return (
@@ -52,9 +63,10 @@ const ManageOrders = () => {
                             <tr key={order.id}>
                                 <td>#{order.id}</td>
                                 <td>{new Date(order.createdAt).toLocaleDateString()}</td>
-                                <td>Rs. {order.totalAmount}</td>
+                                <td>€{order.totalAmount}</td> {/* Using Euro symbol */}
                                 <td>
-                                    <span className={`badge badge-${order.status === 'Delivered' ? 'success' : order.status === 'Cancelled' ? 'danger' : 'warning'}`}>
+                                    {/* Apply dynamic class function here */}
+                                    <span className={`p-2 ${getStatusBadgeClass(order.status)}`}>
                                         {order.status}
                                     </span>
                                 </td>
@@ -63,6 +75,7 @@ const ManageOrders = () => {
                                         className="form-control form-control-sm"
                                         value={order.status}
                                         onChange={(e) => handleStatusUpdate(order.id, e.target.value)}
+                                        style={{ width: '150px' }}
                                     >
                                         <option value="Pending">Pending</option>
                                         <option value="Processing">Processing</option>
