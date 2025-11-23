@@ -43,7 +43,7 @@ const Cart = () => {
                                         <span>{item.name}</span>
                                     </div>
                                 </td>
-                                <td>Rs. {parseFloat(item.price).toFixed(2)}</td>
+                                <td>€{parseFloat(item.price).toFixed(2)}</td>
                                 <td>
                                     <div className="btn-group" role="group">
                                         <button className="btn btn-sm btn-outline-secondary" onClick={() => dispatch(removeItemFromCart(item.id))}>-</button>
@@ -51,7 +51,7 @@ const Cart = () => {
                                         <button className="btn btn-sm btn-outline-secondary" onClick={() => dispatch(addItemToCart(item))}>+</button>
                                     </div>
                                 </td>
-                                <td>Rs. {(item.price * item.quantity).toFixed(2)}</td>
+                                <td>€{(item.price * item.quantity).toFixed(2)}</td>
                                 <td>
                                     <button className="btn btn-danger btn-sm" onClick={() => dispatch(deleteItem(item.id))}>
                                         <i className="fa fa-trash"></i> Remove
@@ -64,7 +64,7 @@ const Cart = () => {
             </div>
 
             <div className="d-flex justify-content-end align-items-center mt-3">
-                <h4 className="me-4">Total: Rs. {totalAmount.toFixed(2)}</h4>
+                <h4 className="me-4">Total: €{totalAmount.toFixed(2)}</h4>
                 <button onClick={() => navigate('/checkout')} className="btn btn-success btn-lg">
                     Proceed to Checkout
                 </button>
