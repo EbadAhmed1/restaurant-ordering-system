@@ -125,7 +125,7 @@ const ManageMenu = () => {
                         <tr key={item.id}>
                             <td>{item.name}</td>
                             <td>{item.category}</td>
-                            <td>Rs. {item.price}</td>
+                            <td>€{item.price}</td>
                             <td>
                                 <button className="btn btn-danger btn-sm" onClick={() => handleDelete(item.id)}>Delete</button>
                             </td>
