@@ -25,20 +25,20 @@ const ManageOrders = () => {
         try {
             await apiClient.put(`/admin/orders/${id}/status`, { status: newStatus });
             toast.success(`Order #${id} updated to ${newStatus}`);
-            fetchOrders(); // Refresh list
+            fetchOrders(); 
         } catch (error) {
             toast.error("Failed to update status");
         }
     };
 
-    // Helper to determine badge color
+    // --- FIXED: Updated for Bootstrap 5 classes (bg-*) ---
     const getStatusBadgeClass = (status) => {
         switch (status) {
-            case 'Delivered': return 'badge badge-success'; // Green
-            case 'Cancelled': return 'badge badge-danger';  // Red
-            case 'Processing': return 'badge badge-info text-white';   // Blue
-            case 'Pending': return 'badge badge-warning text-dark'; // Yellow
-            default: return 'badge badge-secondary';        // Grey
+            case 'Delivered': return 'badge bg-success'; // Green background
+            case 'Cancelled': return 'badge bg-danger';  // Red background
+            case 'Processing': return 'badge bg-info text-dark';   // Blue background (dark text for readability)
+            case 'Pending': return 'badge bg-warning text-dark'; // Yellow background
+            default: return 'badge bg-secondary';        // Grey background
         }
     };
 
@@ -63,9 +63,9 @@ const ManageOrders = () => {
                             <tr key={order.id}>
                                 <td>#{order.id}</td>
                                 <td>{new Date(order.createdAt).toLocaleDateString()}</td>
-                                <td>€{order.totalAmount}</td> {/* Using Euro symbol */}
+                                <td>€{order.totalAmount}</td>
                                 <td>
-                                    {/* Apply dynamic class function here */}
+                                    {/* The span now uses the correct bg- classes */}
                                     <span className={`p-2 ${getStatusBadgeClass(order.status)}`}>
                                         {order.status}
                                     </span>
