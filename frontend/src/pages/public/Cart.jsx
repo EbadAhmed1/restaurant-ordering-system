@@ -3,10 +3,35 @@ import { useSelector, useDispatch } from 'react-redux';
 import { Link, useNavigate } from 'react-router-dom';
 import { addItemToCart, removeItemFromCart, deleteItem } from '../../features/cart/cartSlice';
 
+// Fallback image
+const PLACEHOLDER_IMAGE = 'https://placehold.co/600x400?text=No+Image';
+
 const Cart = () => {
     const { cartItems, totalAmount } = useSelector((state) => state.cart);
     const dispatch = useDispatch();
     const navigate = useNavigate();
+
+    // --- HELPER FUNCTION FOR IMAGES (Same as in Menu) ---
+    const getImageUrl = (imagePath) => {
+        if (!imagePath) return PLACEHOLDER_IMAGE;
+
+        // 1. Clean up Windows slashes
+        let cleanPath = imagePath.replace(/\\/g, '/');
+
+        // 2. Ensure it starts with a slash
+        if (!cleanPath.startsWith('/')) {
+            cleanPath = `/${cleanPath}`;
+        }
+
+        // 3. Prepend '/public' if missing
+        if (!cleanPath.startsWith('/public')) {
+            cleanPath = `/public${cleanPath}`;
+        }
+
+        // 4. Return full URL with Backend Port
+        return `http://localhost:5000${cleanPath}`;
+    };
+    // ----------------------------------------------------
 
     if (cartItems.length === 0) {
         return (
@@ -21,7 +46,7 @@ const Cart = () => {
         <div className="container py-5">
             <h2 className="mb-4">Your Cart</h2>
             <div className="table-responsive">
-                <table className="table table-bordered table-hover">
+                <table className="table table-bordered table-hover align-middle">
                     <thead className="thead-light">
                         <tr>
                             <th>Item</th>
@@ -36,25 +61,30 @@ const Cart = () => {
                             <tr key={item.id}>
                                 <td>
                                     <div className="d-flex align-items-center">
-                                        {/* Use placeholder if image missing */}
-                                        {item.imageUrl && (
-                                            <img src={item.imageUrl} alt={item.name} style={{width: '50px', marginRight: '10px'}} />
-                                        )}
-                                        <span>{item.name}</span>
+                                        {/* UPDATED IMAGE TAG */}
+                                        <img 
+                                            src={getImageUrl(item.imageUrl)} 
+                                            alt={item.name} 
+                                            style={{ width: '60px', height: '60px', objectFit: 'cover', marginRight: '15px', borderRadius: '5px' }} 
+                                            onError={(e) => { e.target.src = PLACEHOLDER_IMAGE; }}
+                                            referrerPolicy="no-referrer"
+                                            crossOrigin="anonymous"
+                                        />
+                                        <span className="h6 mb-0">{item.name}</span>
                                     </div>
                                 </td>
-                                <td>Rs. {parseFloat(item.price).toFixed(2)}</td>
+                                <td>€{parseFloat(item.price).toFixed(2)}</td>
                                 <td>
                                     <div className="btn-group" role="group">
                                         <button className="btn btn-sm btn-outline-secondary" onClick={() => dispatch(removeItemFromCart(item.id))}>-</button>
-                                        <span className="btn btn-sm btn-light disabled">{item.quantity}</span>
+                                        <span className="btn btn-sm btn-light disabled px-3">{item.quantity}</span>
                                         <button className="btn btn-sm btn-outline-secondary" onClick={() => dispatch(addItemToCart(item))}>+</button>
                                     </div>
                                 </td>
-                                <td>Rs. {(item.price * item.quantity).toFixed(2)}</td>
+                                <td>€{(item.price * item.quantity).toFixed(2)}</td>
                                 <td>
                                     <button className="btn btn-danger btn-sm" onClick={() => dispatch(deleteItem(item.id))}>
-                                        <i className="fa fa-trash"></i> Remove
+                                        Remove
                                     </button>
                                 </td>
                             </tr>
@@ -63,8 +93,8 @@ const Cart = () => {
                 </table>
             </div>
 
-            <div className="d-flex justify-content-end align-items-center mt-3">
-                <h4 className="me-4">Total: Rs. {totalAmount.toFixed(2)}</h4>
+            <div className="d-flex justify-content-end align-items-center mt-4 p-3 bg-light rounded">
+                <h4 className="me-4 mb-0">Total: <span className="text-success">€{totalAmount.toFixed(2)}</span></h4>
                 <button onClick={() => navigate('/checkout')} className="btn btn-success btn-lg">
                     Proceed to Checkout
                 </button>

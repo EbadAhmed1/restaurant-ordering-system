@@ -5,6 +5,11 @@ import { logout } from '../../features/auth/authSlice';
 
 const Header = () => {
     const { isAuthenticated, user } = useSelector(state => state.auth);
+    
+    // --- ADD THIS LINE ---
+    const { totalQuantity } = useSelector(state => state.cart); 
+    // --------------------
+
     const dispatch = useDispatch();
 
     const handleLogout = () => {
@@ -14,10 +19,7 @@ const Header = () => {
     return (
         <header className="navbar navbar-expand-lg navbar-dark bg-dark fixed-top">
             <div className="container-fluid">
-                {/* CHANGED: Updated Brand Name */}
-                <Link className="navbar-brand" to="/">
-                    OrderHub
-                </Link>
+                <Link className="navbar-brand" to="/">OrderHub</Link>
                 
                 <div className="collapse navbar-collapse">
                     <ul className="navbar-nav me-auto mb-2 mb-lg-0">
@@ -31,39 +33,32 @@ const Header = () => {
                         )}
                     </ul>
 
-                    {/* Right-aligned Navigation (Auth and Cart) */}
                     <ul className="navbar-nav ms-auto">
                         <li className="nav-item">
                             <Link className="nav-link" to="/cart">
                                 <i className="fa fa-shopping-cart me-2"></i>
-                                Cart (0) 
+                                {/* --- UPDATE THIS LINE --- */}
+                                Cart ({totalQuantity || 0}) 
                             </Link>
                         </li>
+                        
                         
                         {isAuthenticated ? (
                             <>
                                 <li className="nav-item">
-                                    <span className="nav-link text-white">
-                                        Welcome, {user?.username || 'User'}
-                                    </span>
+                                    <span className="nav-link text-white">Welcome, {user?.username}</span>
                                 </li>
                                 <li className="nav-item">
-                                    <button 
-                                        className="btn btn-outline-danger btn-sm" 
-                                        onClick={handleLogout}
-                                    >
-                                        Logout
-                                    </button>
+                                    <Link className="nav-link" to="/orders/history">My Orders</Link>
+                                </li>
+                                <li className="nav-item">
+                                    <button className="btn btn-outline-danger btn-sm" onClick={handleLogout}>Logout</button>
                                 </li>
                             </>
                         ) : (
                             <>
-                                <li className="nav-item">
-                                    <Link className="nav-link" to="/login">Login</Link>
-                                </li>
-                                <li className="nav-item">
-                                    <Link className="nav-link" to="/register">Register</Link>
-                                </li>
+                                <li className="nav-item"><Link className="nav-link" to="/login">Login</Link></li>
+                                <li className="nav-item"><Link className="nav-link" to="/register">Register</Link></li>
                             </>
                         )}
                     </ul>

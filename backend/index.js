@@ -9,6 +9,13 @@ require('dotenv').config({ path: './backend/.env' });
 const app = express();
 const PORT = process.env.PORT || 5000;
 
+require('./models/User');
+require('./models/Menu');
+require('./models/Order');
+require('./models/OrderItem');
+require('./models/Payment');      // Now Sequelize knows about Payments
+require('./models/Reservation');
+
 // Connect to Database and sync models
 const startServer = async () => {
     await connectDB();
@@ -19,6 +26,10 @@ const startServer = async () => {
     app.use(helmet());
     app.use(cors()); // Allow cross-origin requests from your frontend
     app.use(express.json()); // Body parser for JSON requests
+
+
+    app.use('/public', express.static('public'));
+
 
     // --- Routes ---
     app.use('/api', allRoutes);

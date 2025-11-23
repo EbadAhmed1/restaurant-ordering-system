@@ -8,7 +8,10 @@ import Register from './pages/public/Register.jsx';
 import Menu from './pages/public/Menu.jsx';
 import Cart from './pages/public/Cart.jsx';
 import Checkout from './pages/public/Checkout.jsx';
-// import AdminDashboard from './pages/admin/AdminDashboard.jsx'; // Comment this out if you haven't created it yet
+import AdminDashboard from './pages/admin/AdminDashboard.jsx';
+import ManageMenu from './pages/admin/ManageMenu.jsx';
+import ManageOrders from './pages/admin/ManageOrders.jsx';
+import OrderHistory from './pages/public/OrderHistory.jsx';
 
 // Components for Protected Routes
 import PrivateRoute from './components/security/PrivateRoute.jsx';
@@ -33,13 +36,14 @@ const App = () => {
                  {/* Checkout is already imported, so this is fine */}
                 <Route path="/checkout" element={<Checkout />} />
                 {/* <Route path="/orders/history" element={<OrderHistory />} />  <-- COMMENT THIS OUT */}
+                <Route path="/orders/history" element={<OrderHistory />} />
             </Route>
             
             {/* --- Protected Admin Routes --- */}
             <Route element={<PrivateRoute allowedRoles={['admin']} />}>
-                {/* <Route path="/admin/dashboard" element={<AdminDashboard />} />   <-- COMMENT THIS OUT */}
-                {/* <Route path="/admin/manage-menu" element={<ManageMenu />} />     <-- COMMENT THIS OUT */}
-                {/* <Route path="/admin/manage-orders" element={<ManageOrders />} /> <-- COMMENT THIS OUT */}
+                {<Route path="/admin/dashboard" element={<AdminDashboard />} />   }
+                {<Route path="/admin/manage-menu" element={<ManageMenu />} />     }
+                {<Route path="/admin/manage-orders" element={<ManageOrders />} /> }
             </Route>
 
             {/* Catch-all for 404 */}
