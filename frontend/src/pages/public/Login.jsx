@@ -11,23 +11,20 @@ const Login = () => {
     const dispatch = useDispatch();
     const navigate = useNavigate();
 
-    const { isAuthenticated, status, error, user } = useSelector((state) => state.auth);
+    const { isAuthenticated, status, error } = useSelector((state) => state.auth);
 
     useEffect(() => {
         if (isAuthenticated) {
-            // Redirect based on role after successful login
-            if (user && user.role === 'admin') {
-                navigate('/admin/dashboard');
-            } else {
-                navigate('/menu');
-            }
+            // CHANGED: Removed admin specific check. 
+            // Now EVERYONE redirects to the Landing Page (Home)
+            navigate('/'); 
         }
 
         if (status === 'failed' && error) {
             toast.error(error);
             dispatch(clearError());
         }
-    }, [isAuthenticated, status, error, navigate, dispatch, user]);
+    }, [isAuthenticated, status, error, navigate, dispatch]);
 
     const handleSubmit = (e) => {
         e.preventDefault();
