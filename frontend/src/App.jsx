@@ -12,6 +12,7 @@ import AdminDashboard from './pages/admin/AdminDashboard.jsx';
 import ManageMenu from './pages/admin/ManageMenu.jsx';
 import ManageOrders from './pages/admin/ManageOrders.jsx';
 import OrderHistory from './pages/public/OrderHistory.jsx';
+import ManageUsers from './pages/admin/ManageUsers.jsx';
 
 // Components for Protected Routes
 import PrivateRoute from './components/security/PrivateRoute.jsx';
@@ -44,6 +45,7 @@ const App = () => {
                 {<Route path="/admin/dashboard" element={<AdminDashboard />} />   }
                 {<Route path="/admin/manage-menu" element={<ManageMenu />} />     }
                 {<Route path="/admin/manage-orders" element={<ManageOrders />} /> }
+                <Route path="/admin/users" element={<ManageUsers />} />
             </Route>
 
             {/* Catch-all for 404 */}
