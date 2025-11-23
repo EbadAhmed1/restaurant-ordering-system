@@ -4,6 +4,9 @@ import { useNavigate } from 'react-router-dom';
 import { placeOrder, resetOrderStatus } from '../../features/orders/orderSlice';
 import { toast } from 'react-toastify';
 
+// Fallback image
+const PLACEHOLDER_IMAGE = 'https://placehold.co/600x400?text=No+Image';
+
 const Checkout = () => {
     const dispatch = useDispatch();
     const navigate = useNavigate();
@@ -12,14 +15,22 @@ const Checkout = () => {
     const { user } = useSelector((state) => state.auth);
     const { status, error, currentOrder } = useSelector((state) => state.orders);
 
-    // State to control the Confirmation Modal
     const [showModal, setShowModal] = useState(false);
-    const [paymentMethod, setPaymentMethod] = useState('COD'); // Default to Cash on Delivery
+    const [paymentMethod, setPaymentMethod] = useState('COD');
 
-    // Handle Order Success/Failure
+    // --- HELPER FOR IMAGES ---
+    const getImageUrl = (imagePath) => {
+        if (!imagePath) return PLACEHOLDER_IMAGE;
+        let cleanPath = imagePath.replace(/\\/g, '/');
+        if (!cleanPath.startsWith('/')) cleanPath = `/${cleanPath}`;
+        if (!cleanPath.startsWith('/public')) cleanPath = `/public${cleanPath}`;
+        return `http://localhost:5000${cleanPath}`;
+    };
+    // -------------------------
+
     useEffect(() => {
         if (status === 'succeeded' && currentOrder) {
-            setShowModal(false); // Close modal
+            setShowModal(false);
             toast.success('Payment Verified! Order placed successfully.');
             navigate('/'); 
             dispatch(resetOrderStatus());
@@ -31,7 +42,6 @@ const Checkout = () => {
         }
     }, [status, error, currentOrder, navigate, dispatch]);
 
-    // Step 1: Open the Modal instead of dispatching immediately
     const handleProceed = () => {
         if (cartItems.length === 0) {
             toast.warning("Your cart is empty!");
@@ -40,7 +50,6 @@ const Checkout = () => {
         setShowModal(true);
     };
 
-    // Step 2: Actually place the order (called from Modal)
     const handleConfirmPayment = () => {
         const orderPayload = {
             items: cartItems.map(item => ({
@@ -48,7 +57,6 @@ const Checkout = () => {
                 quantity: item.quantity
             }))
         };
-        // In a real app, you might send 'paymentMethod' to the backend here too
         dispatch(placeOrder(orderPayload));
     };
 
@@ -67,8 +75,19 @@ const Checkout = () => {
                                 {cartItems.map(item => (
                                     <li key={item.id} className="list-group-item d-flex justify-content-between align-items-center">
                                         <div className="d-flex align-items-center">
-                                            <span className="badge badge-primary badge-pill mr-3">{item.quantity}x</span>
-                                            {item.name}
+                                            {/* ADDED IMAGE HERE */}
+                                            <img 
+                                                src={getImageUrl(item.imageUrl)} 
+                                                alt={item.name} 
+                                                style={{ width: '50px', height: '50px', objectFit: 'cover', marginRight: '15px', borderRadius: '4px' }}
+                                                onError={(e) => { e.target.src = PLACEHOLDER_IMAGE; }}
+                                                referrerPolicy="no-referrer"
+                                                crossOrigin="anonymous"
+                                            />
+                                            <div>
+                                                <span className="badge bg-primary rounded-pill me-2">{item.quantity}x</span>
+                                                {item.name}
+                                            </div>
                                         </div>
                                         <span>€{(item.price * item.quantity).toFixed(2)}</span>
                                     </li>
@@ -99,33 +118,31 @@ const Checkout = () => {
                             <div className="form-group mb-4">
                                 <label className="text-muted">Payment Method</label>
                                 <div className="border rounded p-3">
-                                    <div className="custom-control custom-radio mb-2">
+                                    <div className="form-check mb-2">
                                         <input 
+                                            className="form-check-input" 
                                             type="radio" 
+                                            name="paymentMethod" 
                                             id="cod" 
-                                            name="paymentMethod" 
-                                            className="custom-control-input" 
                                             checked={paymentMethod === 'COD'} 
-                                            onChange={() => setPaymentMethod('COD')}
+                                            onChange={() => setPaymentMethod('COD')} 
                                         />
-                                        <label className="custom-control-label" htmlFor="cod">Cash on Delivery</label>
+                                        <label className="form-check-label" htmlFor="cod">
+                                            Cash on Delivery
+                                        </label>
                                     </div>
-                                    <div className="custom-control custom-radio">
-                                        <input 
-                                            type="radio" 
-                                            id="card" 
-                                            name="paymentMethod" 
-                                            className="custom-control-input" 
-                                            disabled 
-                                        />
-                                        <label className="custom-control-label text-muted" htmlFor="card">Credit Card (Coming Soon)</label>
+                                    <div className="form-check">
+                                        <input className="form-check-input" type="radio" name="paymentMethod" id="card" disabled />
+                                        <label className="form-check-label text-muted" htmlFor="card">
+                                            Credit Card (Coming Soon)
+                                        </label>
                                     </div>
                                 </div>
                             </div>
                             
                             <button 
                                 onClick={handleProceed}
-                                className="btn btn-primary btn-block btn-lg w-100"
+                                className="btn btn-primary btn-block w-100 btn-lg"
                                 disabled={status === 'loading' || cartItems.length === 0}
                             >
                                 Proceed to Verification
@@ -135,24 +152,21 @@ const Checkout = () => {
                 </div>
             </div>
 
-            {/* --- Verification Modal (Custom React Implementation) --- */}
+            {/* Verification Modal */}
             {showModal && (
                 <>
-                    {/* Backdrop */}
                     <div className="modal-backdrop fade show"></div>
-                    {/* Modal */}
                     <div className="modal fade show d-block" tabIndex="-1" role="dialog">
                         <div className="modal-dialog modal-dialog-centered" role="document">
                             <div className="modal-content">
                                 <div className="modal-header">
                                     <h5 className="modal-title">Verify Payment</h5>
-                                    <button type="button" className="close" onClick={() => setShowModal(false)}>
-                                        <span aria-hidden="true">&times;</span>
-                                    </button>
+                                    <button type="button" className="btn-close" onClick={() => setShowModal(false)}></button>
                                 </div>
                                 <div className="modal-body text-center">
                                     <div className="mb-3">
-                                        <i className="fa fa-check-circle text-success" style={{ fontSize: '3rem' }}></i>
+                                        {/* Simple Check Icon using CSS/Text or FontAwesome if available */}
+                                        <div style={{ fontSize: '3rem', color: '#28a745' }}>✓</div>
                                     </div>
                                     <h5>Confirm Your Order?</h5>
                                     <p className="text-muted mb-1">You are about to place an order via <strong>{paymentMethod}</strong>.</p>
@@ -174,11 +188,7 @@ const Checkout = () => {
                                         onClick={handleConfirmPayment}
                                         disabled={status === 'loading'}
                                     >
-                                        {status === 'loading' ? (
-                                            <span><span className="spinner-border spinner-border-sm mr-2"></span>Processing...</span>
-                                        ) : (
-                                            'Confirm & Place Order'
-                                        )}
+                                        {status === 'loading' ? 'Processing...' : 'Confirm & Place Order'}
                                     </button>
                                 </div>
                             </div>
