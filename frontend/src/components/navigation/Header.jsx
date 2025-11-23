@@ -42,11 +42,14 @@ const Header = () => {
                             </Link>
                         </li>
                         
-                        {/* ... Rest of the code (Auth links) remains the same ... */}
+                        
                         {isAuthenticated ? (
                             <>
                                 <li className="nav-item">
                                     <span className="nav-link text-white">Welcome, {user?.username}</span>
+                                </li>
+                                <li className="nav-item">
+                                    <Link className="nav-link" to="/orders/history">My Orders</Link>
                                 </li>
                                 <li className="nav-item">
                                     <button className="btn btn-outline-danger btn-sm" onClick={handleLogout}>Logout</button>

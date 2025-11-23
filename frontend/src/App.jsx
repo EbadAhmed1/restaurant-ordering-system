@@ -11,6 +11,7 @@ import Checkout from './pages/public/Checkout.jsx';
 import AdminDashboard from './pages/admin/AdminDashboard.jsx';
 import ManageMenu from './pages/admin/ManageMenu.jsx';
 import ManageOrders from './pages/admin/ManageOrders.jsx';
+import OrderHistory from './pages/public/OrderHistory.jsx';
 
 // Components for Protected Routes
 import PrivateRoute from './components/security/PrivateRoute.jsx';
@@ -35,6 +36,7 @@ const App = () => {
                  {/* Checkout is already imported, so this is fine */}
                 <Route path="/checkout" element={<Checkout />} />
                 {/* <Route path="/orders/history" element={<OrderHistory />} />  <-- COMMENT THIS OUT */}
+                <Route path="/orders/history" element={<OrderHistory />} />
             </Route>
             
             {/* --- Protected Admin Routes --- */}
