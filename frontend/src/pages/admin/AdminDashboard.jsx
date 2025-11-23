@@ -75,7 +75,8 @@ const AdminDashboard = () => {
                                 <i className="fa-solid fa-users fa-2x"></i>
                             </div>
                             <h4 className="card-title fw-bold">User Management</h4>
-                            <button className="btn btn-light rounded-pill px-4 fw-bold text-info mt-2 disabled">Coming Soon</button>
+                            <p className="card-text text-center opacity-75">View registered users.</p>
+                            <Link to="/admin/users" className="btn btn-light rounded-pill px-4 fw-bold text-info mt-2">Go to Users</Link>
                         </div>
                     </div>
                 </div>
