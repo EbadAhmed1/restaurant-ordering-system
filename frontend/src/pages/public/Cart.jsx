@@ -11,6 +11,13 @@ const Cart = () => {
     const dispatch = useDispatch();
     const navigate = useNavigate();
 
+    // Navigate to menu when last item is removed
+    React.useEffect(() => {
+        if (cartItems.length === 0) {
+            navigate('/menu');
+        }
+    }, [cartItems.length, navigate]);
+
     // --- HELPER FUNCTION FOR IMAGES (Same as in Menu) ---
     const getImageUrl = (imagePath) => {
         if (!imagePath) return PLACEHOLDER_IMAGE;
@@ -29,7 +36,7 @@ const Cart = () => {
         }
 
         // 4. Return full URL with Backend Port
-        return `http://localhost:5000${cleanPath}`;
+        return `http://localhost:4500${cleanPath}`;
     };
     // ----------------------------------------------------
 

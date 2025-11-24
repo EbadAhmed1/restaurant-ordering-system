@@ -1,5 +1,5 @@
 import React from 'react';
-import { Link, NavLink } from 'react-router-dom'; // Keep both imports
+import { Link, NavLink, useNavigate } from 'react-router-dom'; // Keep both imports
 import { useDispatch, useSelector } from 'react-redux';
 import { logout } from '../../features/auth/authSlice';
 
@@ -7,9 +7,11 @@ const Header = () => {
     const { isAuthenticated, user } = useSelector(state => state.auth);
     const { totalQuantity } = useSelector(state => state.cart); 
     const dispatch = useDispatch();
+    const navigate = useNavigate();
 
     const handleLogout = () => {
         dispatch(logout());
+        navigate('/login');
     };
 
     // Custom style for interactive links

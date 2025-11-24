@@ -26,8 +26,8 @@ const MenuItemCard = ({ item }) => {
             cleanPath = `/public${cleanPath}`;
         }
 
-        // 4. Return full URL with correct Backend Port (5000)
-        return `http://localhost:5000${cleanPath}`;
+        // 4. Return full URL with correct Backend Port (4500)
+        return `http://localhost:4500${cleanPath}`;
     };
 
     const handleAddToCart = () => {
@@ -36,28 +36,29 @@ const MenuItemCard = ({ item }) => {
     };
 
     return (
-        <div className="col-lg-4 col-md-6 mb-4">
-            <div className="card h-100 shadow-sm">
+        <div className="col-lg-4 col-md-6 mb-3">
+            <div className="card shadow-sm">
                 <img 
                     className="card-img-top" 
                     src={getImageUrl(item.imageUrl)} 
                     alt={item.name} 
-                    style={{ height: '200px', objectFit: 'cover' }}
+                    style={{ height: '120px', objectFit: 'cover' }}
                     referrerPolicy="no-referrer"
                     crossOrigin="anonymous"
                     // onError={(e) => { e.target.src = PLACEHOLDER_IMAGE; }} 
                 />
-                <div className="card-body d-flex flex-column">
-                    <h5 className="card-title text-center">{item.name}</h5>
-                    <p className="card-text text-muted flex-grow-1">
-                        {item.description ? item.description.substring(0, 70) + '...' : 'Fresh and delicious!'}
+                <div className="card-body py-2 px-3">
+                    <h6 className="card-title text-center mb-1">{item.name}</h6>
+                    <p className="card-text text-muted small mb-2" style={{ fontSize: '0.85rem', lineHeight: '1.3' }}>
+                        {item.description ? item.description.substring(0, 35) + '...' : '121...'}
                     </p>
-                    <div className="d-flex justify-content-between align-items-center mt-3">
-                        <h4 className="text-success mb-0">
+                    <div className="d-flex justify-content-between align-items-center">
+                        <h5 className="text-success mb-0" style={{ fontSize: '1.1rem' }}>
                             €{parseFloat(item.price).toFixed(2)}
-                        </h4>
+                        </h5>
                         <button 
-                            className="btn btn-primary btn-sm"
+                            className="btn btn-primary btn-sm px-2 py-1"
+                            style={{ fontSize: '0.85rem' }}
                             onClick={handleAddToCart}
                             disabled={!item.isAvailable}
                         >
