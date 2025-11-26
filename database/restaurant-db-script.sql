@@ -1,33 +1,8 @@
 SET SQL_MODE = "NO_AUTO_VALUE_ON_ZERO";
 START TRANSACTION;
 SET time_zone = "+00:00";
-
---
 -- Database: `restaurant_db`
 --
-
-DELIMITER $$
---
--- Procedures
---
-CREATE DEFINER=`root`@`localhost` PROCEDURE `AddMenuItem` (IN `p_name` VARCHAR(100), IN `p_price` DECIMAL(10,2), IN `p_category` VARCHAR(50), IN `p_image` VARCHAR(255))   BEGIN
-    INSERT INTO menu (name, price, category, imageUrl, isAvailable)
-    VALUES (p_name, p_price, p_category, p_image, 1);
-END$$
-
---
--- Functions
---
-CREATE DEFINER=`root`@`localhost` FUNCTION `GetTotalRevenue` () RETURNS DECIMAL(10,2) DETERMINISTIC BEGIN
-    DECLARE total DECIMAL(10,2);
-    SELECT SUM(totalAmount) INTO total 
-    FROM orders 
-    WHERE status = 'Delivered';
-    
-    RETURN IFNULL(total, 0.00);
-END$$
-
-DELIMITER ;
 
 -- --------------------------------------------------------
 
@@ -52,7 +27,6 @@ CREATE TABLE `menu` (
 --
 
 INSERT INTO `menu` (`id`, `name`, `description`, `price`, `category`, `imageUrl`, `isAvailable`, `createdAt`, `updatedAt`) VALUES
-(1, 'Margherita Pizza', NULL, 33.00, 'Pizza', 'pizza.jpg', 1, '0000-00-00 00:00:00', '0000-00-00 00:00:00'),
 (2, 'Margherita Pizza', 'daddwa', 33.00, 'Pizza', '\\uploads\\menu_images\\imageUrl-1763844289878.jpg', 1, '2025-11-22 20:44:49', '2025-11-22 20:44:49'),
 (3, 'dsad', 'asdsadsa', 22.00, 'Pizza', '\\uploads\\menu_images\\imageUrl-1763845204148.jpg', 1, '2025-11-22 21:00:04', '2025-11-22 21:00:04'),
 (4, 'check', '121', 33.00, 'Pizza', '\\uploads\\menu_images\\imageUrl-1763845243197.PNG', 1, '2025-11-22 21:00:43', '2025-11-22 21:00:43'),
@@ -98,22 +72,7 @@ INSERT INTO `orderitems` (`id`, `orderId`, `menuId`, `quantity`, `priceAtOrder`,
 (18, 12, 4, 1, 33.00, 33.00),
 (19, 13, 2, 1, 33.00, 33.00),
 (20, 13, 3, 1, 22.00, 22.00),
-(21, 13, 4, 1, 33.00, 33.00),
-(24, 16, 1, 2, 33.00, 66.00),
-(25, 17, 2, 1, 33.00, 33.00),
-(26, 17, 5, 1, 18.00, 18.00);
-
---
--- Triggers `orderitems`
---
-DELIMITER $$
-CREATE TRIGGER `AfterOrderItemInsert` AFTER INSERT ON `orderitems` FOR EACH ROW BEGIN
-    UPDATE orders 
-    SET totalAmount = totalAmount + NEW.subtotal
-    WHERE id = NEW.orderId;
-END
-$$
-DELIMITER ;
+(21, 13, 4, 1, 33.00, 33.00);
 
 -- --------------------------------------------------------
 
@@ -147,23 +106,7 @@ INSERT INTO `orders` (`id`, `userId`, `totalAmount`, `status`, `createdAt`, `upd
 (10, 2, 88.00, 'Pending', '2025-11-23 18:56:23', '2025-11-23 18:56:23'),
 (11, 2, 88.00, 'Cancelled', '2025-11-23 20:02:08', '2025-11-23 20:54:47'),
 (12, 2, 88.00, 'Delivered', '2025-11-23 20:09:33', '2025-11-23 20:54:29'),
-(13, 2, 88.00, 'Pending', '2025-11-23 22:14:11', '2025-11-23 22:14:11'),
-(16, 1, 66.00, 'Pending', '0000-00-00 00:00:00', '0000-00-00 00:00:00'),
-(17, 4, 102.00, 'Pending', '2025-11-25 11:26:07', '2025-11-25 11:26:07');
-
--- --------------------------------------------------------
-
---
--- Stand-in structure for view `ordersummaryview`
--- (See below for the actual view)
---
-CREATE TABLE `ordersummaryview` (
-`OrderID` int(11)
-,`CustomerName` varchar(100)
-,`totalAmount` decimal(10,2)
-,`status` enum('Pending','Processing','Delivered','Cancelled')
-,`userId` int(11)
-);
+(13, 2, 88.00, 'Pending', '2025-11-23 22:14:11', '2025-11-23 22:14:11');
 
 -- --------------------------------------------------------
 
@@ -222,17 +165,7 @@ CREATE TABLE `users` (
 INSERT INTO `users` (`id`, `username`, `email`, `password`, `role`, `createdAt`, `updatedAt`) VALUES
 (1, 'admin', 'admin@test.com', '$2b$10$ctFLL9DQdgK.hK8MfJSgCe9jewMqm7ho/LXsASfwMBb8GgElpUSru', 'admin', '2025-11-22 20:00:15', '2025-11-22 20:00:15'),
 (2, 'admin1', 'admin1@test.com', '$2b$10$2T0FgjvgbEns57/WHrMIAOf0f1Q/go/RRy5l/wIqu4Pr0vvXT8wKi', 'admin', '2025-11-22 20:05:50', '2025-11-22 20:05:50'),
-(3, 'customer', 'customer@test.com', '$2b$10$Ldkd7cQT/VlYl/Q8ajCnmuu5B9M5KtOZXwhP0keut6guYm74nKmgq', 'customer', '2025-11-23 18:11:12', '2025-11-23 18:11:12'),
-(4, 'admin5', 'admin5@test.com', '$2b$10$2WmC3gvZEuD56vSQhpfCRedHEnLGKrXWlRLWccGmchXP4Mag9K0Ea', 'admin', '2025-11-25 11:23:32', '2025-11-25 11:23:32');
-
--- --------------------------------------------------------
-
---
--- Structure for view `ordersummaryview`
---
-DROP TABLE IF EXISTS `ordersummaryview`;
-
-CREATE ALGORITHM=UNDEFINED DEFINER=`root`@`localhost` SQL SECURITY DEFINER VIEW `ordersummaryview`  AS SELECT `o`.`id` AS `OrderID`, `u`.`username` AS `CustomerName`, `o`.`totalAmount` AS `totalAmount`, `o`.`status` AS `status`, `o`.`userId` AS `userId` FROM (`orders` `o` join `users` `u` on(`o`.`userId` = `u`.`id`)) ;
+(3, 'customer', 'customer@test.com', '$2b$10$Ldkd7cQT/VlYl/Q8ajCnmuu5B9M5KtOZXwhP0keut6guYm74nKmgq', 'customer', '2025-11-23 18:11:12', '2025-11-23 18:11:12');
 
 --
 -- Indexes for dumped tables
@@ -307,13 +240,13 @@ ALTER TABLE `menu`
 -- AUTO_INCREMENT for table `orderitems`
 --
 ALTER TABLE `orderitems`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=27;
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=22;
 
 --
 -- AUTO_INCREMENT for table `orders`
 --
 ALTER TABLE `orders`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=18;
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=14;
 
 --
 -- AUTO_INCREMENT for table `payments`
@@ -331,7 +264,7 @@ ALTER TABLE `reservations`
 -- AUTO_INCREMENT for table `users`
 --
 ALTER TABLE `users`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=5;
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=4;
 
 --
 -- Constraints for dumped tables
