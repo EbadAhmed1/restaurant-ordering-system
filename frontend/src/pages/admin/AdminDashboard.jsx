@@ -46,7 +46,7 @@ const AdminDashboard = () => {
             
             {/* --- ACTION BUTTONS (Top Row) --- */}
             <div className="row mb-5">
-                <div className="col-md-4 mb-3">
+                <div className="col-md-3 mb-3">
                     <div className="card text-white h-100 shadow border-0" style={{ backgroundColor: '#0d6efd', borderRadius: '15px' }}>
                         <div className="card-body d-flex flex-column justify-content-center align-items-center p-4">
                             <div className="mb-3 p-3 rounded-circle bg-white bg-opacity-25">
@@ -57,7 +57,7 @@ const AdminDashboard = () => {
                         </div>
                     </div>
                 </div>
-                <div className="col-md-4 mb-3">
+                <div className="col-md-3 mb-3">
                     <div className="card text-white h-100 shadow border-0" style={{ backgroundColor: '#198754', borderRadius: '15px' }}>
                         <div className="card-body d-flex flex-column justify-content-center align-items-center p-4">
                             <div className="mb-3 p-3 rounded-circle bg-white bg-opacity-25">
@@ -68,7 +68,18 @@ const AdminDashboard = () => {
                         </div>
                     </div>
                 </div>
-                <div className="col-md-4 mb-3">
+                <div className="col-md-3 mb-3">
+                    <div className="card text-white h-100 shadow border-0" style={{ backgroundColor: '#6f42c1', borderRadius: '15px' }}>
+                        <div className="card-body d-flex flex-column justify-content-center align-items-center p-4">
+                            <div className="mb-3 p-3 rounded-circle bg-white bg-opacity-25">
+                                <i className="fa-solid fa-calendar-check fa-2x"></i>
+                            </div>
+                            <h4 className="card-title fw-bold">Manage Reservations</h4>
+                            <Link to="/admin/manage-reservations" className="btn btn-light rounded-pill px-4 fw-bold mt-2" style={{ color: '#6f42c1' }}>Go to Reservations</Link>
+                        </div>
+                    </div>
+                </div>
+                <div className="col-md-3 mb-3">
                     <div className="card text-white h-100 shadow border-0" style={{ backgroundColor: '#0dcaf0', borderRadius: '15px' }}>
                         <div className="card-body d-flex flex-column justify-content-center align-items-center p-4">
                             <div className="mb-3 p-3 rounded-circle bg-white bg-opacity-25">

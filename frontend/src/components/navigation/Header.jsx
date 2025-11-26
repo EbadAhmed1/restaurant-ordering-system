@@ -42,6 +42,11 @@ const Header = () => {
                         <li className="nav-item">
                             <NavLink className="nav-link" to="/menu" style={navLinkStyle}>Menu</NavLink>
                         </li>
+                        {isAuthenticated && (
+                            <li className="nav-item">
+                                <NavLink className="nav-link" to="/reservations" style={navLinkStyle}>Reservations</NavLink>
+                            </li>
+                        )}
                         {user?.role === 'admin' && (
                             <li className="nav-item">
                                 <NavLink className="nav-link text-warning" to="/admin/dashboard" style={{fontWeight: 'bold'}}>Admin Panel</NavLink>

@@ -1,17 +1,17 @@
 const express = require('express');
 const router = express.Router();
 
-// Import all specific route files
 const authRoutes = require('./auth');
 const menuRoutes = require('./menu');
 const orderRoutes = require('./order');
 const adminRoutes = require('./admin');
+const reservationRoutes = require('./reservations');
 
-// Mount routes to their respective paths
-router.use('/auth', authRoutes); // /api/auth/...
-router.use('/menu', menuRoutes); // /api/menu/...
-router.use('/orders', orderRoutes); // /api/orders/...
-router.use('/admin', adminRoutes); // /api/admin/...
+router.use('/auth', authRoutes);
+router.use('/menu', menuRoutes);
+router.use('/orders', orderRoutes);
+router.use('/admin', adminRoutes);
+router.use('/reservations', reservationRoutes);
 
 // Basic root route for API status check
 router.get('/', (req, res) => {
