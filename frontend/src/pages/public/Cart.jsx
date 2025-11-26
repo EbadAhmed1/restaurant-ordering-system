@@ -10,11 +10,6 @@ const Cart = () => {
     const dispatch = useDispatch();
     const navigate = useNavigate();
 
-    React.useEffect(() => {
-        if (cartItems.length === 0) {
-            navigate('/menu');
-        }
-    }, [cartItems.length, navigate]);
 
     const getImageUrl = (imagePath) => {
         if (!imagePath) return PLACEHOLDER_IMAGE;
