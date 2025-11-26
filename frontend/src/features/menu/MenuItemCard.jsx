@@ -3,30 +3,16 @@ import { useDispatch } from 'react-redux';
 import { addItemToCart } from '../cart/cartSlice';
 import { toast } from 'react-toastify';
 
-// Fallback image if the product doesn't have one
 const PLACEHOLDER_IMAGE = 'https://placehold.co/600x400?text=No+Image'; 
 
 const MenuItemCard = ({ item }) => {
     const dispatch = useDispatch();
 
-    // Helper to construct the full image URL from the backend
     const getImageUrl = (imagePath) => {
         if (!imagePath) return PLACEHOLDER_IMAGE;
-
-        // 1. Clean up Windows slashes to forward slashes
         let cleanPath = imagePath.replace(/\\/g, '/');
-
-        // 2. Ensure it starts with a slash
-        if (!cleanPath.startsWith('/')) {
-            cleanPath = `/${cleanPath}`;
-        }
-
-        // 3. Prepend '/public' if it's missing (because DB usually stores /uploads/...)
-        if (!cleanPath.startsWith('/public')) {
-            cleanPath = `/public${cleanPath}`;
-        }
-
-        // 4. Return full URL with correct Backend Port (4500)
+        if (!cleanPath.startsWith('/')) cleanPath = `/${cleanPath}`;
+        if (!cleanPath.startsWith('/public')) cleanPath = `/public${cleanPath}`;
         return `http://localhost:4500${cleanPath}`;
     };
 
@@ -45,7 +31,6 @@ const MenuItemCard = ({ item }) => {
                     style={{ height: '120px', objectFit: 'cover' }}
                     referrerPolicy="no-referrer"
                     crossOrigin="anonymous"
-                    // onError={(e) => { e.target.src = PLACEHOLDER_IMAGE; }} 
                 />
                 <div className="card-body py-2 px-3">
                     <h6 className="card-title text-center mb-1">{item.name}</h6>

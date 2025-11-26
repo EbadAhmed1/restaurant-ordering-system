@@ -3,7 +3,6 @@ import { useSelector, useDispatch } from 'react-redux';
 import { Link, useNavigate } from 'react-router-dom';
 import { addItemToCart, removeItemFromCart, deleteItem } from '../../features/cart/cartSlice';
 
-// Fallback image
 const PLACEHOLDER_IMAGE = 'https://placehold.co/600x400?text=No+Image';
 
 const Cart = () => {
@@ -11,34 +10,19 @@ const Cart = () => {
     const dispatch = useDispatch();
     const navigate = useNavigate();
 
-    // Navigate to menu when last item is removed
     React.useEffect(() => {
         if (cartItems.length === 0) {
             navigate('/menu');
         }
     }, [cartItems.length, navigate]);
 
-    // --- HELPER FUNCTION FOR IMAGES (Same as in Menu) ---
     const getImageUrl = (imagePath) => {
         if (!imagePath) return PLACEHOLDER_IMAGE;
-
-        // 1. Clean up Windows slashes
         let cleanPath = imagePath.replace(/\\/g, '/');
-
-        // 2. Ensure it starts with a slash
-        if (!cleanPath.startsWith('/')) {
-            cleanPath = `/${cleanPath}`;
-        }
-
-        // 3. Prepend '/public' if missing
-        if (!cleanPath.startsWith('/public')) {
-            cleanPath = `/public${cleanPath}`;
-        }
-
-        // 4. Return full URL with Backend Port
+        if (!cleanPath.startsWith('/')) cleanPath = `/${cleanPath}`;
+        if (!cleanPath.startsWith('/public')) cleanPath = `/public${cleanPath}`;
         return `http://localhost:4500${cleanPath}`;
     };
-    // ----------------------------------------------------
 
     if (cartItems.length === 0) {
         return (
@@ -68,7 +52,6 @@ const Cart = () => {
                             <tr key={item.id}>
                                 <td>
                                     <div className="d-flex align-items-center">
-                                        {/* UPDATED IMAGE TAG */}
                                         <img 
                                             src={getImageUrl(item.imageUrl)} 
                                             alt={item.name} 

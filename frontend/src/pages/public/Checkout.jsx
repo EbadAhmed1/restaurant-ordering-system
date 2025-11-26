@@ -4,7 +4,6 @@ import { useNavigate } from 'react-router-dom';
 import { placeOrder, resetOrderStatus } from '../../features/orders/orderSlice';
 import { toast } from 'react-toastify';
 
-// Fallback image
 const PLACEHOLDER_IMAGE = 'https://placehold.co/600x400?text=No+Image';
 
 const Checkout = () => {
@@ -25,7 +24,6 @@ const Checkout = () => {
     });
     const [isProcessing, setIsProcessing] = useState(false);
 
-    // --- HELPER FOR IMAGES ---
     const getImageUrl = (imagePath) => {
         if (!imagePath) return PLACEHOLDER_IMAGE;
         let cleanPath = imagePath.replace(/\\/g, '/');
@@ -33,7 +31,6 @@ const Checkout = () => {
         if (!cleanPath.startsWith('/public')) cleanPath = `/public${cleanPath}`;
         return `http://localhost:4500${cleanPath}`;
     };
-    // -------------------------
 
     useEffect(() => {
         if (status === 'succeeded' && currentOrder) {
@@ -59,7 +56,6 @@ const Checkout = () => {
 
     const handleConfirmPayment = () => {
         if (paymentMethod === 'Card') {
-            // Simulate card processing
             setIsProcessing(true);
             setTimeout(() => {
                 setIsProcessing(false);
@@ -67,16 +63,22 @@ const Checkout = () => {
                     items: cartItems.map(item => ({
                         menuId: item.id,
                         quantity: item.quantity
-                    }))
+                    })),
+                    paymentMethod: 'Card',
+                    cardDetails: {
+                        lastFourDigits: cardDetails.cardNumber.slice(-4),
+                        cardholderName: cardDetails.cardName
+                    }
                 };
                 dispatch(placeOrder(orderPayload));
-            }, 2000); // 2 second delay to simulate payment processing
+            }, 2000);
         } else {
             const orderPayload = {
                 items: cartItems.map(item => ({
                     menuId: item.id,
                     quantity: item.quantity
-                }))
+                })),
+                paymentMethod: 'COD'
             };
             dispatch(placeOrder(orderPayload));
         }
@@ -86,19 +88,16 @@ const Checkout = () => {
         const { name, value } = e.target;
         let formattedValue = value;
 
-        // Format card number with spaces
         if (name === 'cardNumber') {
             formattedValue = value.replace(/\s/g, '').replace(/(\d{4})/g, '$1 ').trim();
             if (formattedValue.length > 19) return;
         }
 
-        // Format expiry date
         if (name === 'expiryDate') {
             formattedValue = value.replace(/\D/g, '').replace(/(\d{2})(\d)/, '$1/$2');
             if (formattedValue.length > 5) return;
         }
 
-        // Limit CVV to 3 digits
         if (name === 'cvv') {
             formattedValue = value.replace(/\D/g, '');
             if (formattedValue.length > 3) return;
@@ -111,7 +110,6 @@ const Checkout = () => {
         <div className="container py-5">
             <h2 className="mb-4">Checkout</h2>
             <div className="row">
-                {/* Order Summary Column */}
                 <div className="col-md-7">
                     <div className="card mb-4 shadow-sm">
                         <div className="card-header bg-white">
@@ -122,7 +120,6 @@ const Checkout = () => {
                                 {cartItems.map(item => (
                                     <li key={item.id} className="list-group-item d-flex justify-content-between align-items-center">
                                         <div className="d-flex align-items-center">
-                                            {/* ADDED IMAGE HERE */}
                                             <img 
                                                 src={getImageUrl(item.imageUrl)} 
                                                 alt={item.name} 
@@ -150,7 +147,6 @@ const Checkout = () => {
                     </div>
                 </div>
 
-                {/* Payment Details Column */}
                 <div className="col-md-5">
                     <div className="card shadow-sm">
                         <div className="card-header bg-white">
@@ -196,7 +192,6 @@ const Checkout = () => {
                                 </div>
                             </div>
 
-                            {/* Credit Card Form */}
                             {paymentMethod === 'Card' && (
                                 <div className="card bg-light mb-4">
                                     <div className="card-body">
@@ -271,7 +266,6 @@ const Checkout = () => {
                 </div>
             </div>
 
-            {/* Verification Modal */}
             {showModal && (
                 <>
                     <div className="modal-backdrop fade show"></div>

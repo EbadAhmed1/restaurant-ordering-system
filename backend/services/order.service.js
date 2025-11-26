@@ -1,15 +1,9 @@
-const Order = require('../models/Order'); // Sequelize Order Model
-const Menu = require('../models/Menu');   // Sequelize Menu Model
-const OrderItem = require('../models/OrderItem'); // Import the new OrderItem model
+const Order = require('../models/Order');
+const Menu = require('../models/Menu');
+const OrderItem = require('../models/OrderItem');
+const Payment = require('../models/Payment');
 
-/**
- * Service function to create a new order.
- * 1. Validates item availability.
- * 2. Recalculates the total amount server-side.
- * 3. Creates the order and order items.
- */
-exports.createOrder = async (userId, items) => {
-    // --- 1. Server-Side Price and Availability Check ---
+exports.createOrder = async (userId, items, paymentMethod = 'COD', cardDetails = null) => {
     const itemIds = items.map(item => item.menuId);
 
     const menuItems = await Menu.findAll({ 
@@ -35,7 +29,6 @@ exports.createOrder = async (userId, items) => {
         const subtotal = itemPrice * requestedItem.quantity;
         serverCalculatedTotal += subtotal;
         
-        // Prepare data for the OrderItem table
         orderItemsData.push({
             menuId: menuItem.id,
             quantity: requestedItem.quantity,
@@ -44,15 +37,12 @@ exports.createOrder = async (userId, items) => {
         });
     }
 
-    // --- 2. Create the Order ---
     const newOrder = await Order.create({
         userId: userId,
         totalAmount: serverCalculatedTotal.toFixed(2),
         status: 'Pending'
     });
 
-    // --- 3. Create Order Items (Bulk Insert) ---
-    // Attach the new orderId to each item
     const itemsWithOrderId = orderItemsData.map(item => ({
         ...item,
         orderId: newOrder.id
@@ -60,12 +50,21 @@ exports.createOrder = async (userId, items) => {
 
     await OrderItem.bulkCreate(itemsWithOrderId);
 
+    const transactionId = paymentMethod === 'Card' 
+        ? `TXN-${Date.now()}-${newOrder.id}` 
+        : `COD-${newOrder.id}`;
+
+    await Payment.create({
+        orderId: newOrder.id,
+        transactionId: transactionId,
+        paymentMethod: paymentMethod === 'Card' ? 'Credit Card' : 'COD',
+        amountPaid: serverCalculatedTotal.toFixed(2),
+        status: 'Success'
+    });
+
     return newOrder;
 };
 
-/**
- * Service function to retrieve a user's order history.
- */
 exports.getOrderHistory = async (userId) => {
     const orders = await Order.findAll({
         where: { userId: userId },
