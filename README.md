@@ -1,6 +1,6 @@
 # OrderHub - Modern Restaurant Ordering System
 
-OrderHub is a robust, full-stack web application designed to streamline food ordering for customers and management for restaurant administrators. This project is a complete modernization of a legacy monolithic system, transitioning to a secure, scalable **RESTful API** architecture with a dynamic **React** frontend.
+OrderHub is a robust, full-stack web application designed to streamline food ordering for customers and management for restaurant administrators. The system is built on a secure and scalable RESTful API architecture, seamlessly integrated with a dynamic React frontend to ensure high performance and maintainability.
 
 ## Tech Stack
 
@@ -18,7 +18,7 @@ OrderHub is a robust, full-stack web application designed to streamline food ord
 * **ORM:** Sequelize (Schema definition, Associations, Validation)
 * **Authentication:** JWT (JSON Web Tokens) & Bcrypt (Password Hashing)
 * **File Handling:** Multer (Image uploads)
-* **Security:** Helmet (Headers), CORS, Express-Validator
+* **Security:** CORS, Express-Validator
 
 ---
 
