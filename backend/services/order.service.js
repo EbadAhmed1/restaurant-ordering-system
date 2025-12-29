@@ -72,7 +72,11 @@ exports.getOrderHistory = async (userId) => {
         include: [{ 
             model: OrderItem, 
             as: 'items',
-            include: [{ model: Menu, as: 'menuItem', attributes: ['name'] }] 
+            include: [{ 
+                model: Menu, 
+                as: 'menuItem', 
+                attributes: ['name', 'price', 'imageUrl'] 
+            }] 
         }]
     });
 

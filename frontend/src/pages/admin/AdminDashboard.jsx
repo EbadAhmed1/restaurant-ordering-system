@@ -1,14 +1,17 @@
 import React, { useEffect, useState } from 'react';
-import { Link, Outlet } from 'react-router-dom';
 import apiClient from '../../api/api';
+import { FaShoppingBag, FaDollarSign, FaUsers, FaChartLine } from 'react-icons/fa';
+import './AdminPages.css';
 
 const AdminDashboard = () => {
     const [stats, setStats] = useState({
         totalOrders: 0,
         totalRevenue: 0,
-        pendingOrders: 0,
-        totalUsers: 0
+        totalUsers: 0,
+        avgOrderValue: 0
     });
+
+    const [recentOrders, setRecentOrders] = useState([]);
 
     useEffect(() => {
         const fetchData = async () => {
@@ -16,15 +19,16 @@ const AdminDashboard = () => {
                 const ordersRes = await apiClient.get('/admin/orders');
                 const orders = ordersRes.data;
                 const revenue = orders.reduce((acc, order) => acc + parseFloat(order.totalAmount), 0);
-                const pending = orders.filter(o => o.status === 'Pending').length;
                 const usersRes = await apiClient.get('/admin/users');
                 
                 setStats({
                     totalOrders: orders.length,
                     totalRevenue: revenue,
-                    pendingOrders: pending,
-                    totalUsers: usersRes.data.length
+                    totalUsers: usersRes.data.length,
+                    avgOrderValue: orders.length > 0 ? revenue / orders.length : 0
                 });
+
+                setRecentOrders(orders.slice(0, 4));
             } catch (error) {
                 console.error("Error loading dashboard stats", error);
             }
@@ -32,174 +36,158 @@ const AdminDashboard = () => {
         fetchData();
     }, []);
 
-    // Helper for card styles to reduce repetition
-    const CardIcon = ({ icon, color, bg }) => (
-        <div className={`d-flex align-items-center justify-content-center rounded-circle me-3`} 
-             style={{ width: '50px', height: '50px', backgroundColor: bg, color: color }}>
-            <i className={`${icon} fs-5`}></i>
-        </div>
-    );
+    const statCards = [
+        {
+            title: 'Total Orders',
+            value: stats.totalOrders.toLocaleString(),
+            icon: <FaShoppingBag />,
+            color: '#e74c3c',
+            bgColor: '#ffe5e5',
+            change: '+12.5%'
+        },
+        {
+            title: 'Revenue',
+            value: `$${stats.totalRevenue.toLocaleString()}`,
+            icon: <FaDollarSign />,
+            color: '#e74c3c',
+            bgColor: '#ffe5e5',
+            change: '+8.2%'
+        },
+        {
+            title: 'Customers',
+            value: stats.totalUsers.toLocaleString(),
+            icon: <FaUsers />,
+            color: '#e74c3c',
+            bgColor: '#ffe5e5',
+            change: '+5.3%'
+        },
+        {
+            title: 'Avg Order',
+            value: `$${stats.avgOrderValue.toFixed(2)}`,
+            icon: <FaChartLine />,
+            color: '#e74c3c',
+            bgColor: '#ffe5e5',
+            change: '-4.1%'
+        }
+    ];
 
     return (
-        <div className="container py-5">
-            <h2 className="mb-4 fw-bold text-dark">Admin Dashboard</h2>
-            
-            {/* --- ACTION BUTTONS (Top Row) --- */}
-            <div className="row mb-5">
-                <div className="col-md-3 mb-3">
-                    <div className="card text-white h-100 shadow border-0" style={{ backgroundColor: '#0d6efd', borderRadius: '15px' }}>
-                        <div className="card-body d-flex flex-column justify-content-center align-items-center p-4">
-                            <div className="mb-3 p-3 rounded-circle bg-white bg-opacity-25">
-                                <i className="fa-solid fa-utensils fa-2x"></i>
-                            </div>
-                            <h4 className="card-title fw-bold">Manage Menu</h4>
-                            <Link to="/admin/manage-menu" className="btn btn-light rounded-pill px-4 fw-bold text-primary mt-2">Go to Menu</Link>
+        <div className="admin-page">
+            <div className="page-header">
+                <div>
+                    <h1>Dashboard Overview</h1>
+                    <p className="page-subtitle">Welcome back, here's what's happening today</p>
+                </div>
+                <button className="export-btn">Export Report</button>
+            </div>
+
+            {/* Stats Cards */}
+            <div className="stats-grid">
+                {statCards.map((stat, index) => (
+                    <div key={index} className="stat-card">
+                        <div className="stat-icon" style={{ background: stat.bgColor, color: stat.color }}>
+                            {stat.icon}
+                        </div>
+                        <div className="stat-content">
+                            <p className="stat-label">{stat.title}</p>
+                            <h2 className="stat-value">{stat.value}</h2>
+                            <span className={`stat-change ${stat.change.startsWith('+') ? 'positive' : 'negative'}`}>
+                                {stat.change}
+                            </span>
+                        </div>
+                    </div>
+                ))}
+            </div>
+
+            {/* Charts Section */}
+            <div className="charts-section">
+                <div className="chart-card large">
+                    <div className="card-header">
+                        <h3>Revenue Overview</h3>
+                        <select className="chart-filter">
+                            <option>Last 7 Days</option>
+                            <option>Last 30 Days</option>
+                            <option>Last 3 Months</option>
+                        </select>
+                    </div>
+                    <div className="chart-placeholder">
+                        <div className="line-chart-mock">
+                            <svg viewBox="0 0 600 200" className="chart-svg">
+                                <polyline
+                                    fill="none"
+                                    stroke="#e74c3c"
+                                    strokeWidth="3"
+                                    points="0,150 100,120 200,140 300,80 400,100 500,60 600,70"
+                                />
+                                <polyline
+                                    fill="none"
+                                    stroke="#3498db"
+                                    strokeWidth="3"
+                                    strokeDasharray="5,5"
+                                    points="0,160 100,140 200,150 300,100 400,120 500,80 600,90"
+                                />
+                            </svg>
                         </div>
                     </div>
                 </div>
-                <div className="col-md-3 mb-3">
-                    <div className="card text-white h-100 shadow border-0" style={{ backgroundColor: '#198754', borderRadius: '15px' }}>
-                        <div className="card-body d-flex flex-column justify-content-center align-items-center p-4">
-                            <div className="mb-3 p-3 rounded-circle bg-white bg-opacity-25">
-                                <i className="fa-solid fa-shopping-bag fa-2x"></i>
-                            </div>
-                            <h4 className="card-title fw-bold">Manage Orders</h4>
-                            <Link to="/admin/manage-orders" className="btn btn-light rounded-pill px-4 fw-bold text-success mt-2">Go to Orders</Link>
-                        </div>
+
+                <div className="chart-card">
+                    <div className="card-header">
+                        <h3>Order Status</h3>
                     </div>
-                </div>
-                <div className="col-md-3 mb-3">
-                    <div className="card text-white h-100 shadow border-0" style={{ backgroundColor: '#6f42c1', borderRadius: '15px' }}>
-                        <div className="card-body d-flex flex-column justify-content-center align-items-center p-4">
-                            <div className="mb-3 p-3 rounded-circle bg-white bg-opacity-25">
-                                <i className="fa-solid fa-calendar-check fa-2x"></i>
-                            </div>
-                            <h4 className="card-title fw-bold">Manage Reservations</h4>
-                            <Link to="/admin/manage-reservations" className="btn btn-light rounded-pill px-4 fw-bold mt-2" style={{ color: '#6f42c1' }}>Go to Reservations</Link>
+                    <div className="pie-chart-mock">
+                        <div className="pie-segment" style={{ background: '#27ae60' }}>
+                            <span>Completed<br/>65%</span>
                         </div>
-                    </div>
-                </div>
-                <div className="col-md-3 mb-3">
-                    <div className="card text-white h-100 shadow border-0" style={{ backgroundColor: '#0dcaf0', borderRadius: '15px' }}>
-                        <div className="card-body d-flex flex-column justify-content-center align-items-center p-4">
-                            <div className="mb-3 p-3 rounded-circle bg-white bg-opacity-25">
-                                <i className="fa-solid fa-users fa-2x"></i>
-                            </div>
-                            <h4 className="card-title fw-bold">User Management</h4>
-                            <p className="card-text text-center opacity-75">View registered users.</p>
-                            <Link to="/admin/users" className="btn btn-light rounded-pill px-4 fw-bold text-info mt-2">Go to Users</Link>
+                        <div className="pie-segment" style={{ background: '#f39c12' }}>
+                            <span>Pending<br/>20%</span>
+                        </div>
+                        <div className="pie-segment" style={{ background: '#3498db' }}>
+                            <span>Processing<br/>10%</span>
+                        </div>
+                        <div className="pie-segment" style={{ background: '#e74c3c' }}>
+                            <span>Cancelled<br/>5%</span>
                         </div>
                     </div>
                 </div>
             </div>
 
-            {/* --- STATS ROW (Matching the Design) --- */}
-            <div className="row mb-5">
-                {/* Total Orders */}
-                <div className="col-md-3 mb-3">
-                    <div className="card border-0 shadow-sm p-3 h-100" style={{ borderRadius: '12px' }}>
-                        <div className="card-body">
-                            <CardIcon icon="fa-solid fa-bag-shopping" color="#0d6efd" bg="#e7f1ff" />
-                            <h6 className="text-muted mt-3 mb-1">Total Orders</h6>
-                            <h2 className="fw-bold mb-2 text-dark">{stats.totalOrders}</h2>
-                            <small className="text-success fw-bold"><i className="fa-solid fa-arrow-trend-up me-1"></i>+12.5%</small> 
-                            <small className="text-muted ms-1">from last month</small>
-                        </div>
+            {/* Popular Items & Recent Orders */}
+            <div className="bottom-section">
+                <div className="popular-items-card">
+                    <h3>Popular Items</h3>
+                    <div className="popular-items-list">
+                        {['Burger', 'Pizza', 'Chicken', 'Fries', 'Wings'].map((item, idx) => (
+                            <div key={idx} className="popular-item">
+                                <span className="item-name">{item}</span>
+                                <div className="item-bar">
+                                    <div className="item-bar-fill" style={{ width: `${100 - idx * 15}%` }}></div>
+                                </div>
+                            </div>
+                        ))}
                     </div>
                 </div>
 
-                {/* Revenue */}
-                <div className="col-md-3 mb-3">
-                    <div className="card border-0 shadow-sm p-3 h-100" style={{ borderRadius: '12px' }}>
-                        <div className="card-body">
-                            <CardIcon icon="fa-solid fa-euro-sign" color="#198754" bg="#d1e7dd" />
-                            <h6 className="text-muted mt-3 mb-1">Revenue</h6>
-                            <h2 className="fw-bold mb-2 text-dark">€{stats.totalRevenue.toLocaleString()}</h2>
-                            <small className="text-success fw-bold"><i className="fa-solid fa-arrow-trend-up me-1"></i>+8.2%</small> 
-                            <small className="text-muted ms-1">from last month</small>
-                        </div>
-                    </div>
-                </div>
-
-                {/* Active Users */}
-                <div className="col-md-3 mb-3">
-                    <div className="card border-0 shadow-sm p-3 h-100" style={{ borderRadius: '12px' }}>
-                        <div className="card-body">
-                            <CardIcon icon="fa-regular fa-user" color="#ffc107" bg="#fff3cd" />
-                            <h6 className="text-muted mt-3 mb-1">Active Users</h6>
-                            <h2 className="fw-bold mb-2 text-dark">{stats.totalUsers}</h2>
-                            <small className="text-success fw-bold"><i className="fa-solid fa-arrow-trend-up me-1"></i>+5.3%</small> 
-                            <small className="text-muted ms-1">from last month</small>
-                        </div>
-                    </div>
-                </div>
-
-                {/* Pending Orders */}
-                <div className="col-md-3 mb-3">
-                    <div className="card border-0 shadow-sm p-3 h-100" style={{ borderRadius: '12px' }}>
-                        <div className="card-body">
-                            <CardIcon icon="fa-regular fa-clock" color="#dc3545" bg="#f8d7da" />
-                            <h6 className="text-muted mt-3 mb-1">Pending Orders</h6>
-                            <h2 className="fw-bold mb-2 text-dark">{stats.pendingOrders}</h2>
-                            <small className="text-danger fw-bold"><i className="fa-solid fa-arrow-trend-down me-1"></i>-3.1%</small> 
-                            <small className="text-muted ms-1">from last month</small>
-                        </div>
+                <div className="recent-orders-card">
+                    <h3>Recent Orders</h3>
+                    <div className="orders-list">
+                        {recentOrders.map((order) => (
+                            <div key={order.id} className="order-item">
+                                <div className="order-info">
+                                    <span className="order-id">#{order.id}</span>
+                                    <span className="order-customer">John Doe</span>
+                                </div>
+                                <div className="order-details">
+                                    <span className="order-amount">${order.totalAmount}</span>
+                                    <span className={`order-status status-${order.status.toLowerCase()}`}>
+                                        {order.status}
+                                    </span>
+                                </div>
+                            </div>
+                        ))}
                     </div>
                 </div>
             </div>
-
-            {/* --- RECENT ACTIVITY ROW --- */}
-            <h4 className="fw-bold mb-3">Recent Activity</h4>
-            <div className="card border-0 shadow-sm" style={{ borderRadius: '15px' }}>
-                <div className="card-body p-0">
-                    {/* Item 1: New Order */}
-                    <div className="d-flex align-items-center p-4 border-bottom">
-                        <CardIcon icon="fa-solid fa-bag-shopping" color="#0d6efd" bg="#e7f1ff" />
-                        <div className="flex-grow-1">
-                            <p className="mb-0 fw-bold text-dark">New order #{stats.totalOrders} placed by a Customer</p>
-                        </div>
-                        <small className="text-muted">5 minutes ago</small>
-                    </div>
-
-                    {/* Item 2: Completed Order */}
-                    <div className="d-flex align-items-center p-4 border-bottom">
-                        <CardIcon icon="fa-solid fa-check" color="#198754" bg="#d1e7dd" />
-                        <div className="flex-grow-1">
-                            <p className="mb-0 text-dark">Order #1230 completed and delivered</p>
-                        </div>
-                        <small className="text-muted">12 minutes ago</small>
-                    </div>
-
-                    {/* Item 3: New User */}
-                    <div className="d-flex align-items-center p-4 border-bottom">
-                        <CardIcon icon="fa-regular fa-user" color="#ffc107" bg="#fff3cd" />
-                        <div className="flex-grow-1">
-                            <p className="mb-0 text-dark">New user Sarah Johnson registered</p>
-                        </div>
-                        <small className="text-muted">25 minutes ago</small>
-                    </div>
-
-                    {/* Item 4: Menu Updated (Purple Icon) */}
-                    <div className="d-flex align-items-center p-4 border-bottom">
-                        <CardIcon icon="fa-solid fa-cube" color="#6f42c1" bg="#e0cffc" />
-                        <div className="flex-grow-1">
-                            <p className="mb-0 text-dark">Menu item 'Margherita Pizza' updated</p>
-                        </div>
-                        <small className="text-muted">1 hour ago</small>
-                    </div>
-
-                    {/* Item 5: Cancelled (Red Icon) */}
-                    <div className="d-flex align-items-center p-4">
-                        <CardIcon icon="fa-solid fa-trash-can" color="#dc3545" bg="#f8d7da" />
-                        <div className="flex-grow-1">
-                            <p className="mb-0 text-dark">Order #1228 cancelled by customer</p>
-                        </div>
-                        <small className="text-muted">2 hours ago</small>
-                    </div>
-                </div>
-            </div>
-            
-            <Outlet />
         </div>
     );
 };

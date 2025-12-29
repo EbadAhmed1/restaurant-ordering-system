@@ -3,15 +3,18 @@ import { useDispatch, useSelector } from 'react-redux';
 import { fetchMenu } from '../../features/menu/menuSlice';
 import apiClient from '../../api/api';
 import { toast } from 'react-toastify';
+import { FaHeart, FaStar, FaTrash, FaTimes } from 'react-icons/fa';
+import './AdminPages.css';
 
-// Fallback image
-const PLACEHOLDER_IMAGE = 'https://placehold.co/100x100?text=No+Image';
+const PLACEHOLDER_IMAGE = 'https://placehold.co/400x300?text=No+Image';
 
 const ManageMenu = () => {
     const dispatch = useDispatch();
     const { items } = useSelector((state) => state.menu);
     
-    // Form State
+    const [searchTerm, setSearchTerm] = useState('');
+    const [filterCategory, setFilterCategory] = useState('All Items');
+    const [showAddModal, setShowAddModal] = useState(false);
     const [formData, setFormData] = useState({
         name: '',
         description: '',
@@ -20,10 +23,7 @@ const ManageMenu = () => {
         isAvailable: true
     });
     const [imageFile, setImageFile] = useState(null);
-    const [searchTerm, setSearchTerm] = useState('');
-    const [filterCategory, setFilterCategory] = useState('All Categories');
 
-    // Helper for images
     const getImageUrl = (imagePath) => {
         if (!imagePath) return PLACEHOLDER_IMAGE;
         let cleanPath = imagePath.replace(/\\/g, '/');
@@ -63,6 +63,7 @@ const ManageMenu = () => {
             dispatch(fetchMenu());
             setFormData({ name: '', description: '', price: '', category: 'Pizza', isAvailable: true });
             setImageFile(null);
+            setShowAddModal(false);
         } catch (error) {
             toast.error(error.response?.data?.message || 'Failed to add item');
         }
@@ -80,156 +81,268 @@ const ManageMenu = () => {
         }
     };
 
-    // Filter Logic
     const filteredItems = items.filter(item => {
         const matchesSearch = item.name.toLowerCase().includes(searchTerm.toLowerCase());
-        const matchesCategory = filterCategory === 'All Categories' || item.category === filterCategory;
+        const matchesCategory = filterCategory === 'All Items' || item.category === filterCategory;
         return matchesSearch && matchesCategory;
     });
 
     return (
-        <div className="container py-5">
-            
-            <h2 className="mb-4 fw-bold text-dark">Manage Menu</h2>
-            {/* --- SECTION 1: ADD NEW ITEM --- */}
-            <div className="card shadow-sm border-0 mb-5" style={{ borderRadius: '12px' }}>
-                <div className="card-body p-4">
-                    <h4 className="mb-4 fw-bold text-dark">Add New Item</h4>
-                    <form onSubmit={handleSubmit}>
-                        <div className="row g-3">
-                            <div className="col-md-6">
-                                <label className="form-label text-muted small fw-bold">Item Name</label>
-                                <input type="text" className="form-control" name="name" placeholder="Item Name" value={formData.name} onChange={handleInputChange} required />
-                            </div>
-                            <div className="col-md-6">
-                                <label className="form-label text-muted small fw-bold">Price (€)</label>
-                                <div className="input-group">
-                                    <span className="input-group-text">€</span>
-                                    <input type="number" className="form-control" name="price" placeholder="0.00" value={formData.price} onChange={handleInputChange} required />
-                                </div>
-                            </div>
-                            <div className="col-12">
-                                <label className="form-label text-muted small fw-bold">Description</label>
-                                <textarea className="form-control" name="description" rows="3" placeholder="Description" value={formData.description} onChange={handleInputChange} />
-                            </div>
-                            <div className="col-md-6">
-                                <label className="form-label text-muted small fw-bold">Category</label>
-                                <select className="form-select" name="category" value={formData.category} onChange={handleInputChange}>
-                                    <option value="Pizza">Pizza</option>
-                                    <option value="Burger">Burger</option>
-                                    <option value="Pasta">Pasta</option>
-                                    <option value="Salad">Salad</option>
-                                    <option value="Sides">Sides</option>
-                                    <option value="Drinks">Drinks</option>
-                                    <option value="Dessert">Dessert</option>
-                                </select>
-                            </div>
-                            <div className="col-md-6">
-                                <label className="form-label text-muted small fw-bold">Image</label>
-                                <input type="file" className="form-control" onChange={handleFileChange} />
-                            </div>
-                            <div className="col-12 mt-3">
-                                <div className="form-check">
-                                    <input className="form-check-input" type="checkbox" id="avail" name="isAvailable" checked={formData.isAvailable} onChange={handleInputChange} />
-                                    <label className="form-check-label" htmlFor="avail">Available?</label>
-                                </div>
-                            </div>
-                            <div className="col-12 mt-4">
-                                <button type="submit" className="btn btn-success px-4 fw-bold">
-                                    <i className="fa-solid fa-plus me-2"></i> Add Item
-                                </button>
-                            </div>
-                        </div>
-                    </form>
+        <div className="admin-page">
+            <div className="page-header">
+                <div>
+                    <h1>Menu Management</h1>
+                    <p className="page-subtitle">Manage your restaurant menu items</p>
                 </div>
+                <button className="add-btn" onClick={() => setShowAddModal(true)}>
+                    + Add New Item
+                </button>
             </div>
 
-            {/* --- SECTION 2: CURRENT ITEMS LIST --- */}
-            <div className="card shadow-sm border-0" style={{ borderRadius: '12px' }}>
-                <div className="card-body p-4">
-                    <h4 className="mb-4 fw-bold text-dark">Current Menu Items</h4>
-                    
-                    {/* Search and Filter Bar */}
-                    <div className="row mb-4">
-                        <div className="col-md-4">
-                            <div className="input-group">
-                                <span className="input-group-text bg-white border-end-0"><i className="fa-solid fa-search text-muted"></i></span>
-                                <input 
-                                    type="text" 
-                                    className="form-control border-start-0 ps-0" 
-                                    placeholder="Search menu items..." 
-                                    value={searchTerm}
-                                    onChange={(e) => setSearchTerm(e.target.value)}
+            {/* Search and Filter */}
+            <div className="search-filter-bar">
+                <input
+                    type="text"
+                    className="search-input"
+                    placeholder="Search menu items..."
+                    value={searchTerm}
+                    onChange={(e) => setSearchTerm(e.target.value)}
+                />
+                <select 
+                    className="filter-select"
+                    value={filterCategory}
+                    onChange={(e) => setFilterCategory(e.target.value)}
+                >
+                    <option>All Items</option>
+                    <option value="Pizza">Pizza</option>
+                    <option value="Burger">Burger</option>
+                    <option value="Pasta">Pasta</option>
+                    <option value="Salad">Salad</option>
+                    <option value="Sides">Sides</option>
+                    <option value="Drinks">Drinks</option>
+                    <option value="Dessert">Dessert</option>
+                </select>
+            </div>
+
+            {/* Menu Grid */}
+            <div className="menu-grid">
+                {filteredItems.map(item => (
+                    <div key={item.id} className="menu-card">
+                        <div className="menu-card-actions">
+                            <button className="icon-btn" style={{ background: 'white' }}>
+                                <FaHeart color="#e74c3c" />
+                            </button>
+                        </div>
+                        
+                        <img 
+                            src={getImageUrl(item.imageUrl)} 
+                            alt={item.name}
+                            className="menu-card-image"
+                            referrerPolicy="no-referrer"
+                            crossOrigin="anonymous"
+                        />
+                        
+                        <div className="menu-card-content">
+                            <div className="menu-card-header">
+                                <h3 className="menu-card-title">{item.name}</h3>
+                                <span className={`menu-card-category ${item.isAvailable ? '' : 'unavailable'}`}>
+                                    {item.isAvailable ? 'Available' : 'Unavailable'}
+                                </span>
+                            </div>
+                            
+                            <p className="menu-card-description">
+                                {item.description || 'Main Course'}
+                            </p>
+                            
+                            <div className="menu-card-footer">
+                                <span className="menu-card-price">${parseFloat(item.price).toFixed(2)}</span>
+                                <div className="menu-card-rating">
+                                    <FaStar />
+                                    <span>4.{Math.floor(Math.random() * 9)} ({Math.floor(Math.random() * 500) + 100})</span>
+                                </div>
+                            </div>
+                            
+                            <button 
+                                className="action-btn primary"
+                                style={{ width: '100%', marginTop: '12px' }}
+                                onClick={() => handleDelete(item.id)}
+                            >
+                                <FaTrash style={{ marginRight: '8px' }} />
+                                Delete Item
+                            </button>
+                        </div>
+                    </div>
+                ))}
+            </div>
+
+            {filteredItems.length === 0 && (
+                <div style={{ textAlign: 'center', padding: '60px 20px', color: '#7f8c8d' }}>
+                    <p>No menu items found</p>
+                </div>
+            )}
+
+            {/* Add Item Modal */}
+            {showAddModal && (
+                <div style={{
+                    position: 'fixed',
+                    top: 0,
+                    left: 0,
+                    right: 0,
+                    bottom: 0,
+                    background: 'rgba(0, 0, 0, 0.5)',
+                    display: 'flex',
+                    alignItems: 'center',
+                    justifyContent: 'center',
+                    zIndex: 1000,
+                    padding: '20px'
+                }}>
+                    <div style={{
+                        background: 'white',
+                        borderRadius: '12px',
+                        padding: '30px',
+                        maxWidth: '600px',
+                        width: '100%',
+                        maxHeight: '90vh',
+                        overflowY: 'auto',
+                        position: 'relative'
+                    }}>
+                        <button
+                            onClick={() => setShowAddModal(false)}
+                            style={{
+                                position: 'absolute',
+                                top: '20px',
+                                right: '20px',
+                                background: 'none',
+                                border: 'none',
+                                fontSize: '24px',
+                                cursor: 'pointer',
+                                color: '#7f8c8d'
+                            }}
+                        >
+                            <FaTimes />
+                        </button>
+
+                        <h2 style={{ marginBottom: '24px', color: '#2c3e50' }}>Add New Menu Item</h2>
+
+                        <form onSubmit={handleSubmit}>
+                            <div style={{ marginBottom: '20px' }}>
+                                <label style={{ display: 'block', marginBottom: '8px', fontWeight: '600', color: '#2c3e50' }}>
+                                    Item Name
+                                </label>
+                                <input
+                                    type="text"
+                                    name="name"
+                                    className="search-input"
+                                    placeholder="e.g., Margherita Pizza"
+                                    value={formData.name}
+                                    onChange={handleInputChange}
+                                    required
+                                    style={{ width: '100%' }}
                                 />
                             </div>
-                        </div>
-                        <div className="col-md-3">
-                            <select 
-                                className="form-select" 
-                                value={filterCategory} 
-                                onChange={(e) => setFilterCategory(e.target.value)}
-                            >
-                                <option>All Categories</option>
-                                <option value="Pizza">Pizza</option>
-                                <option value="Burger">Burger</option>
-                                <option value="Pasta">Pasta</option>
-                                <option value="Salad">Salad</option>
-                            </select>
-                        </div>
-                    </div>
 
-                    {/* Table */}
-                    <div className="table-responsive">
-                        <table className="table table-hover align-middle">
-                            <thead className="bg-light">
-                                <tr>
-                                    <th className="py-3 ps-3 text-muted" style={{width: '100px'}}>Image</th>
-                                    <th className="py-3 text-muted">Name</th>
-                                    <th className="py-3 text-muted text-center">Category</th>
-                                    <th className="py-3 text-muted text-end">Price</th>
-                                    <th className="py-3 text-muted text-end pe-4">Action</th>
-                                </tr>
-                            </thead>
-                            <tbody>
-                                {filteredItems.map(item => (
-                                    <tr key={item.id}>
-                                        <td className="ps-3">
-                                            <img 
-                                                src={getImageUrl(item.imageUrl)} 
-                                                alt={item.name} 
-                                                className="rounded"
-                                                style={{ width: '60px', height: '60px', objectFit: 'cover' }}
-                                                referrerPolicy="no-referrer"
-                                                crossOrigin="anonymous"
-                                            />
-                                        </td>
-                                        <td className="fw-bold text-dark">{item.name}</td>
-                                        <td className="text-center">
-                                            <span className="badge bg-primary bg-opacity-10 text-primary rounded-pill px-3">
-                                                {item.category}
-                                            </span>
-                                        </td>
-                                        <td className="text-end fw-bold">€{parseFloat(item.price).toFixed(2)}</td>
-                                        <td className="text-end pe-4">
-                                            <button 
-                                                className="btn btn-danger btn-sm px-3" 
-                                                onClick={() => handleDelete(item.id)}
-                                            >
-                                                <i className="fa-solid fa-trash-can me-1"></i> Delete
-                                            </button>
-                                        </td>
-                                    </tr>
-                                ))}
-                                {filteredItems.length === 0 && (
-                                    <tr>
-                                        <td colSpan="5" className="text-center py-4 text-muted">No items found.</td>
-                                    </tr>
-                                )}
-                            </tbody>
-                        </table>
+                            <div style={{ marginBottom: '20px' }}>
+                                <label style={{ display: 'block', marginBottom: '8px', fontWeight: '600', color: '#2c3e50' }}>
+                                    Description
+                                </label>
+                                <textarea
+                                    name="description"
+                                    className="search-input"
+                                    placeholder="Describe the item..."
+                                    value={formData.description}
+                                    onChange={handleInputChange}
+                                    rows="3"
+                                    style={{ width: '100%', resize: 'vertical' }}
+                                />
+                            </div>
+
+                            <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '16px', marginBottom: '20px' }}>
+                                <div>
+                                    <label style={{ display: 'block', marginBottom: '8px', fontWeight: '600', color: '#2c3e50' }}>
+                                        Price ($)
+                                    </label>
+                                    <input
+                                        type="number"
+                                        name="price"
+                                        className="search-input"
+                                        placeholder="0.00"
+                                        step="0.01"
+                                        value={formData.price}
+                                        onChange={handleInputChange}
+                                        required
+                                        style={{ width: '100%' }}
+                                    />
+                                </div>
+
+                                <div>
+                                    <label style={{ display: 'block', marginBottom: '8px', fontWeight: '600', color: '#2c3e50' }}>
+                                        Category
+                                    </label>
+                                    <select
+                                        name="category"
+                                        className="filter-select"
+                                        value={formData.category}
+                                        onChange={handleInputChange}
+                                        style={{ width: '100%' }}
+                                    >
+                                        <option value="Pizza">Pizza</option>
+                                        <option value="Burger">Burger</option>
+                                        <option value="Pasta">Pasta</option>
+                                        <option value="Salad">Salad</option>
+                                        <option value="Sides">Sides</option>
+                                        <option value="Drinks">Drinks</option>
+                                        <option value="Dessert">Dessert</option>
+                                    </select>
+                                </div>
+                            </div>
+
+                            <div style={{ marginBottom: '20px' }}>
+                                <label style={{ display: 'block', marginBottom: '8px', fontWeight: '600', color: '#2c3e50' }}>
+                                    Image
+                                </label>
+                                <input
+                                    type="file"
+                                    className="search-input"
+                                    onChange={handleFileChange}
+                                    accept="image/*"
+                                    style={{ width: '100%' }}
+                                />
+                            </div>
+
+                            <div style={{ marginBottom: '24px' }}>
+                                <label style={{ display: 'flex', alignItems: 'center', gap: '8px', cursor: 'pointer' }}>
+                                    <input
+                                        type="checkbox"
+                                        name="isAvailable"
+                                        checked={formData.isAvailable}
+                                        onChange={handleInputChange}
+                                        style={{ width: '18px', height: '18px', cursor: 'pointer' }}
+                                    />
+                                    <span style={{ fontWeight: '600', color: '#2c3e50' }}>Available for order</span>
+                                </label>
+                            </div>
+
+                            <div style={{ display: 'flex', gap: '12px' }}>
+                                <button
+                                    type="button"
+                                    className="action-btn secondary"
+                                    onClick={() => setShowAddModal(false)}
+                                    style={{ flex: 1 }}
+                                >
+                                    Cancel
+                                </button>
+                                <button
+                                    type="submit"
+                                    className="action-btn primary"
+                                    style={{ flex: 1 }}
+                                >
+                                    Add Item
+                                </button>
+                            </div>
+                        </form>
                     </div>
                 </div>
-            </div>
+            )}
         </div>
     );
 };

@@ -17,6 +17,7 @@ import ManageUsers from './pages/admin/ManageUsers.jsx';
 
 import PrivateRoute from './components/security/PrivateRoute.jsx';
 import PublicLayout from './components/layouts/PublicLayout.jsx';
+import AdminLayout from './components/layouts/AdminLayout.jsx';
 
 const App = () => {
     return (
@@ -37,11 +38,13 @@ const App = () => {
             </Route>
             
             <Route element={<PrivateRoute allowedRoles={['admin']} />}>
-                {<Route path="/admin/dashboard" element={<AdminDashboard />} />   }
-                {<Route path="/admin/manage-menu" element={<ManageMenu />} />     }
-                {<Route path="/admin/manage-orders" element={<ManageOrders />} /> }
-                <Route path="/admin/manage-reservations" element={<ManageReservations />} />
-                <Route path="/admin/users" element={<ManageUsers />} />
+                <Route path="/admin" element={<AdminLayout />}>
+                    <Route path="dashboard" element={<AdminDashboard />} />
+                    <Route path="manage-menu" element={<ManageMenu />} />
+                    <Route path="manage-orders" element={<ManageOrders />} />
+                    <Route path="manage-reservations" element={<ManageReservations />} />
+                    <Route path="users" element={<ManageUsers />} />
+                </Route>
             </Route>
 
             {/* Catch-all for 404 */}

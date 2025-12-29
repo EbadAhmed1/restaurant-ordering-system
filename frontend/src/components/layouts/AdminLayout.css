@@ -1,0 +1,158 @@
+.admin-layout-wrapper {
+  display: flex;
+  flex-direction: column;
+  min-height: 100vh;
+}
+
+.admin-layout {
+  display: flex;
+  flex: 1;
+  background: #f5f6fa;
+  margin-top: 70px; /* Account for fixed header */
+}
+
+/* Sidebar Styles */
+.admin-sidebar {
+  width: 70px;
+  background: #2c3e50;
+  color: white;
+  display: flex;
+  flex-direction: column;
+  transition: width 0.3s ease;
+  position: fixed;
+  height: calc(100vh - 70px); /* Subtract header height */
+  top: 70px; /* Position below header */
+  z-index: 1000;
+  overflow: hidden;
+}
+
+.admin-sidebar:hover {
+  width: 250px;
+}
+
+.sidebar-header {
+  padding: 20px;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+  white-space: nowrap;
+}
+
+.logo {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  font-size: 20px;
+  font-weight: 700;
+  color: white;
+}
+
+.logo-icon {
+  font-size: 24px;
+  color: #e74c3c;
+  min-width: 24px;
+}
+
+.logo-text {
+  opacity: 0;
+  transition: opacity 0.3s ease;
+}
+
+.admin-sidebar:hover .logo-text {
+  opacity: 1;
+}
+
+.sidebar-nav {
+  flex: 1;
+  padding: 20px 0;
+  overflow-y: auto;
+  overflow-x: hidden;
+}
+
+.nav-item {
+  display: flex;
+  align-items: center;
+  gap: 15px;
+  padding: 14px 20px;
+  color: #bdc3c7;
+  text-decoration: none;
+  transition: all 0.3s ease;
+  cursor: pointer;
+  border: none;
+  background: none;
+  width: 100%;
+  text-align: left;
+  font-size: 15px;
+  white-space: nowrap;
+}
+
+.nav-item:hover {
+  background: rgba(255, 255, 255, 0.05);
+  color: white;
+}
+
+.nav-item.active {
+  background: #e74c3c;
+  color: white;
+  border-left: 4px solid #c0392b;
+}
+
+.nav-icon {
+  font-size: 18px;
+  min-width: 18px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.nav-label {
+  opacity: 0;
+  transition: opacity 0.3s ease;
+}
+
+.admin-sidebar:hover .nav-label {
+  opacity: 1;
+}
+
+.sidebar-footer {
+  padding: 20px;
+  border-top: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+/* Main Content Area */
+.admin-main {
+  flex: 1;
+  margin-left: 70px;
+  transition: margin-left 0.3s ease;
+  display: flex;
+  flex-direction: column;
+}
+
+.admin-sidebar:hover ~ .admin-main {
+  margin-left: 250px;
+}
+
+/* Content Area */
+.admin-content {
+  flex: 1;
+  padding: 30px;
+  overflow-y: auto;
+}
+
+/* Responsive */
+@media (max-width: 768px) {
+  .admin-sidebar {
+    transform: translateX(-100%);
+  }
+
+  .admin-sidebar:hover {
+    transform: translateX(0);
+    width: 250px;
+  }
+
+  .admin-main {
+    margin-left: 0;
+  }
+
+  .admin-sidebar:hover ~ .admin-main {
+    margin-left: 0;
+  }
+}

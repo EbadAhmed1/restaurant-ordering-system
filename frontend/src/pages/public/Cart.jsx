@@ -2,6 +2,8 @@ import React from 'react';
 import { useSelector, useDispatch } from 'react-redux';
 import { Link, useNavigate } from 'react-router-dom';
 import { addItemToCart, removeItemFromCart, deleteItem } from '../../features/cart/cartSlice';
+import { FaShoppingCart, FaTrash, FaArrowLeft } from 'react-icons/fa';
+import './Cart.css';
 
 const PLACEHOLDER_IMAGE = 'https://placehold.co/600x400?text=No+Image';
 
@@ -9,7 +11,6 @@ const Cart = () => {
     const { cartItems, totalAmount } = useSelector((state) => state.cart);
     const dispatch = useDispatch();
     const navigate = useNavigate();
-
 
     const getImageUrl = (imagePath) => {
         if (!imagePath) return PLACEHOLDER_IMAGE;
@@ -19,70 +20,145 @@ const Cart = () => {
         return `http://localhost:4500${cleanPath}`;
     };
 
+    const deliveryFee = 3.00;
+    const tax = totalAmount * 0.08;
+    const total = totalAmount + deliveryFee + tax;
+
     if (cartItems.length === 0) {
         return (
-            <div className="container text-center mt-5">
-                <h2>Your Cart is Empty</h2>
-                <Link to="/menu" className="btn btn-primary mt-3">Browse Menu</Link>
+            <div className="cart-page">
+                <div className="container">
+                    <div className="empty-cart">
+                        <FaShoppingCart className="empty-cart-icon" />
+                        <h2>Your cart is empty</h2>
+                        <p>Add some delicious items to get started!</p>
+                        <Link to="/menu" className="browse-menu-btn">
+                            Browse Menu
+                        </Link>
+                    </div>
+                </div>
             </div>
         );
     }
 
     return (
-        <div className="container py-5">
-            <h2 className="mb-4">Your Cart</h2>
-            <div className="table-responsive">
-                <table className="table table-bordered table-hover align-middle">
-                    <thead className="thead-light">
-                        <tr>
-                            <th>Item</th>
-                            <th>Price</th>
-                            <th>Quantity</th>
-                            <th>Subtotal</th>
-                            <th>Action</th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        {cartItems.map((item) => (
-                            <tr key={item.id}>
-                                <td>
-                                    <div className="d-flex align-items-center">
-                                        <img 
-                                            src={getImageUrl(item.imageUrl)} 
-                                            alt={item.name} 
-                                            style={{ width: '60px', height: '60px', objectFit: 'cover', marginRight: '15px', borderRadius: '5px' }} 
-                                            onError={(e) => { e.target.src = PLACEHOLDER_IMAGE; }}
-                                            referrerPolicy="no-referrer"
-                                            crossOrigin="anonymous"
-                                        />
-                                        <span className="h6 mb-0">{item.name}</span>
-                                    </div>
-                                </td>
-                                <td>€{parseFloat(item.price).toFixed(2)}</td>
-                                <td>
-                                    <div className="btn-group" role="group">
-                                        <button className="btn btn-sm btn-outline-secondary" onClick={() => dispatch(removeItemFromCart(item.id))}>-</button>
-                                        <span className="btn btn-sm btn-light disabled px-3">{item.quantity}</span>
-                                        <button className="btn btn-sm btn-outline-secondary" onClick={() => dispatch(addItemToCart(item))}>+</button>
-                                    </div>
-                                </td>
-                                <td>€{(item.price * item.quantity).toFixed(2)}</td>
-                                <td>
-                                    <button className="btn btn-danger btn-sm" onClick={() => dispatch(deleteItem(item.id))}>
-                                        Remove
-                                    </button>
-                                </td>
-                            </tr>
-                        ))}
-                    </tbody>
-                </table>
-            </div>
+        <div className="cart-page">
+            <div className="container">
+                <div className="cart-header">
+                    <Link to="/menu" className="back-link">
+                        <FaArrowLeft /> Continue Shopping
+                    </Link>
+                    <h1>Your Cart</h1>
+                </div>
 
-            <div className="d-flex justify-content-end align-items-center mt-4 p-3 bg-light rounded">
-                <h4 className="me-4 mb-0">Total: <span className="text-success">€{totalAmount.toFixed(2)}</span></h4>
-                <button onClick={() => navigate('/checkout')} className="btn btn-success btn-lg">
-                    Proceed to Checkout
-                </button>
+                <div className="cart-layout">
+                    {/* Cart Items */}
+                    <div className="cart-items-section">
+                        {cartItems.map((item) => (
+                            <div key={item.id} className="cart-item-card">
+                                <img 
+                                    src={getImageUrl(item.imageUrl)} 
+                                    alt={item.name}
+                                    className="cart-item-image"
+                                    onError={(e) => { e.target.src = PLACEHOLDER_IMAGE; }}
+                                    referrerPolicy="no-referrer"
+                                    crossOrigin="anonymous"
+                                />
+                                <div className="cart-item-details">
+                                    <h3>{item.name}</h3>
+                                    <p className="item-price">${(parseFloat(item.price) || 0).toFixed(2)}</p>
+                                </div>
+                                <div className="cart-item-actions">
+                                    <div className="quantity-controls">
+                                        <button 
+                                            className="qty-btn"
+                                            onClick={() => dispatch(removeItemFromCart(item.id))}
+                                        >
+                                            -
+                                        </button>
+                                        <span className="quantity">{item.quantity}</span>
+                                        <button 
+                                            className="qty-btn"
+                                            onClick={() => dispatch(addItemToCart(item))}
+                                        >
+                                            +
+                                        </button>
+                                    </div>
+                                    <p className="item-subtotal">
+                                        ${((parseFloat(item.price) || 0) * item.quantity).toFixed(2)}
+                                    </p>
+                                    <button 
+                                        className="remove-btn"
+                                        onClick={() => dispatch(deleteItem(item.id))}
+                                        title="Remove item"
+                                    >
+                                        <FaTrash />
+                                    </button>
+                                </div>
+                            </div>
+                        ))}
+                    </div>
+
+                    {/* Order Summary */}
+                    <div className="order-summary-section">
+                        <div className="order-summary-card">
+                            <h3>Order Summary</h3>
+                            
+                            <div className="summary-items">
+                                {cartItems.map((item) => (
+                                    <div key={item.id} className="summary-item">
+                                        <div className="summary-item-info">
+                                            <img 
+                                                src={getImageUrl(item.imageUrl)} 
+                                                alt={item.name}
+                                                className="summary-item-image"
+                                            />
+                                            <div>
+                                                <p className="summary-item-name">{item.name}</p>
+                                                <p className="summary-item-qty">Qty: {item.quantity}</p>
+                                            </div>
+                                        </div>
+                                        <p className="summary-item-price">
+                                            ${((parseFloat(item.price) || 0) * item.quantity).toFixed(2)}
+                                        </p>
+                                    </div>
+                                ))}
+                            </div>
+
+                            <div className="summary-divider"></div>
+
+                            <div className="summary-calculations">
+                                <div className="summary-row">
+                                    <span>Subtotal</span>
+                                    <span>${(totalAmount || 0).toFixed(2)}</span>
+                                </div>
+                                <div className="summary-row">
+                                    <span>Tax (8%)</span>
+                                    <span>${tax.toFixed(2)}</span>
+                                </div>
+                                <div className="summary-row">
+                                    <span>Delivery Fee</span>
+                                    <span>${deliveryFee.toFixed(2)}</span>
+                                </div>
+                                <div className="summary-row total-row">
+                                    <span>Total</span>
+                                    <span>${total.toFixed(2)}</span>
+                                </div>
+                            </div>
+
+                            <button 
+                                className="checkout-btn"
+                                onClick={() => navigate('/checkout')}
+                            >
+                                Proceed to Checkout
+                            </button>
+
+                            <p className="delivery-note">
+                                🚚 Free delivery on orders over $30
+                            </p>
+                        </div>
+                    </div>
+                </div>
             </div>
         </div>
     );
